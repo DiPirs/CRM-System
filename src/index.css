@@ -1,0 +1,20 @@
+* {
+	box-sizing: border-box;
+}
+
+button {
+	cursor: pointer;
+}
+
+body {
+	margin: 0;
+	font-family: 'Golos Text', sans-serif;
+}
+
+li {
+	list-style: none;
+}
+
+ul {
+	padding: 0;
+}

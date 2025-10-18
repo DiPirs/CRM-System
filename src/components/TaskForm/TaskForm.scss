@@ -1,0 +1,32 @@
+.form__createNewTask {
+	display: flex;
+	justify-content: space-between;
+	gap: 20px;
+	width: 50%;
+}
+
+.input__container {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	width: 100%;
+}
+
+.container__input {
+	padding: 5px 8px;
+	border: 1px solid #b9b9b9;
+	border-radius: 10px;
+	font-size: 1rem;
+	min-height: 2.5rem;
+}
+
+.form__button {
+	background: none;
+	border: 1px solid #b9b9b9;
+	border-radius: 10px;
+	transition: 0.2s all ease-in-out;
+
+	&:hover {
+		background-color: #c5c5c5;
+	}
+}
