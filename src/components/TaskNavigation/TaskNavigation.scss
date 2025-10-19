@@ -1,0 +1,16 @@
+.nav__taskList {
+	display: flex;
+	gap: 10px;
+}
+
+.nav__button {
+	padding: 10px;
+	background: none;
+	border: 1px solid #b9b9b9;
+	border-radius: 10px;
+	transition: 0.2s all ease-in-out;
+
+	&:hover {
+		background-color: #c5c5c5;
+	}
+}

@@ -1,8 +1,24 @@
+import { useState } from 'react'
 import './TaskForm.scss'
 
 export default function TaskForm() {
+	const [newValue, setNewValue] = useState('')
+
 	const submitTask = () => {
-		console.log('Таска записана')
+		try {
+			fetch(`https://easydev.club/api/v1/todos`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					title: newValue,
+					isDone: false,
+				}),
+			})
+		} catch (err) {
+			console.error('Error:', err)
+		}
 	}
 
 	return (
@@ -21,6 +37,8 @@ export default function TaskForm() {
 						type='text'
 						placeholder='Введите задачу...'
 						className='container__input'
+						value={newValue}
+						onChange={e => setNewValue(e.target.value)}
 					/>
 				</label>
 				<button className='form__button button_submitTask'>
