@@ -9,6 +9,7 @@ interface ITaskList {
 	setTasksInfo: TodoInfo
 	onChangeTask: (taskId: number, newValue: string) => void
 	onDeleteTask: (taskId: number) => void
+	onDoneTask: (taskId: number, value: string, isDone: boolean) => void
 }
 
 export default function TaskList({
@@ -17,6 +18,7 @@ export default function TaskList({
 	setTasksInfo,
 	onChangeTask,
 	onDeleteTask,
+	onDoneTask,
 }: ITaskList) {
 	return (
 		<>
@@ -26,14 +28,19 @@ export default function TaskList({
 			{isLoading && <span>Loading</span>}
 			{!isLoading && (
 				<ul className='toDoList'>
-					{tasks.map(task => (
-						<TaskItem
-							key={task.id}
-							task={task}
-							onChange={newValue => onChangeTask(task.id, newValue)}
-							onDelete={taskId => onDeleteTask(taskId)}
-						/>
-					))}
+					{tasks.map(task =>
+						task.isDone === true ? (
+							<TaskItem
+								key={task.id}
+								task={task}
+								onChange={newValue => onChangeTask(task.id, newValue)}
+								onDelete={taskId => onDeleteTask(taskId)}
+								onDone={isDone => onDoneTask(task.id, task.title, isDone)}
+							/>
+						) : (
+							''
+						)
+					)}
 				</ul>
 			)}
 		</>

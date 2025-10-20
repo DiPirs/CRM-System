@@ -84,6 +84,25 @@ function App() {
 		}
 	}
 
+	function doneTask(taskId: number, value: string, isDone: boolean) {
+		try {
+			fetch(`https://easydev.club/api/v1/todos/${taskId}`, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					title: value,
+					isDone: isDone,
+				}),
+			})
+				.then(() => setLoading(true))
+				.then(() => fetchData())
+		} catch (err) {
+			console.error('Error:', err)
+		}
+	}
+
 	return (
 		<>
 			<div className='form__wrapper'>
@@ -97,6 +116,7 @@ function App() {
 					setTasksInfo={tasksInfo}
 					onChangeTask={changeTask}
 					onDeleteTask={deleteTask}
+					onDoneTask={doneTask}
 				/>
 			</div>
 		</>

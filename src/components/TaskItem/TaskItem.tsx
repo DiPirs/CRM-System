@@ -2,7 +2,12 @@ import { useState } from 'react'
 import './TaskItem.scss'
 import type { ITaskItem } from '../../types/task.types'
 
-export default function TaskItem({ task, onChange, onDelete }: ITaskItem) {
+export default function TaskItem({
+	task,
+	onChange,
+	onDelete,
+	onDone,
+}: ITaskItem) {
 	const [isEditing, setIsEditing] = useState(false)
 	const [isDone, setDone] = useState(task.isDone)
 	const [inputValue, setInputValue] = useState(task.title)
@@ -13,6 +18,7 @@ export default function TaskItem({ task, onChange, onDelete }: ITaskItem) {
 
 	function doneTask() {
 		setDone(true)
+		onDone(true)
 	}
 
 	function acceptChanges() {
