@@ -4,9 +4,13 @@ import './TaskNavigation.scss'
 
 interface ITaskNavigation {
 	tasksFilter: TodoInfo
+	getFilter: (fil: string) => void
 }
 
-export default function TaskNavigation({ tasksFilter }: ITaskNavigation) {
+export default function TaskNavigation({
+	tasksFilter,
+	getFilter,
+}: ITaskNavigation) {
 	const [isActive, setActive] = useState('all')
 
 	return (
@@ -14,7 +18,10 @@ export default function TaskNavigation({ tasksFilter }: ITaskNavigation) {
 			<button
 				id='all'
 				className={`nav__button ${isActive === 'all' ? 'active__button' : ''}`}
-				onClick={() => setActive('all')}
+				onClick={() => {
+					setActive('all')
+					getFilter('all')
+				}}
 			>
 				Все задачи {tasksFilter.all}
 			</button>
@@ -23,7 +30,10 @@ export default function TaskNavigation({ tasksFilter }: ITaskNavigation) {
 				className={`nav__button ${
 					isActive === 'inWork' ? 'active__button' : ''
 				}`}
-				onClick={() => setActive('inWork')}
+				onClick={() => {
+					setActive('inWork')
+					getFilter('inWork')
+				}}
 			>
 				Активные {tasksFilter.inWork}
 			</button>
@@ -32,7 +42,10 @@ export default function TaskNavigation({ tasksFilter }: ITaskNavigation) {
 				className={`nav__button ${
 					isActive === 'completed' ? 'active__button' : ''
 				}`}
-				onClick={() => setActive('completed')}
+				onClick={() => {
+					setActive('completed')
+					getFilter('completed')
+				}}
 			>
 				Законченные {tasksFilter.completed}
 			</button>

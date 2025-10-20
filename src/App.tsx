@@ -61,9 +61,13 @@ function App() {
 					title: newValue,
 					isDone: false,
 				}),
-			})
-				.then(() => setLoading(true))
-				.then(() => fetchData())
+			}).then(() =>
+				setTasks(prevTasks =>
+					prevTasks.map(task =>
+						task.id == taskId ? { ...task, title: newValue } : task
+					)
+				)
+			)
 		} catch (err) {
 			console.error('Error:', err)
 		}
@@ -73,12 +77,9 @@ function App() {
 		try {
 			fetch(`https://easydev.club/api/v1/todos/${taskId}`, {
 				method: 'DELETE',
-			})
-				// .then(() =>
-				// 	setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId))
-				// )
-				.then(() => setLoading(true))
-				.then(() => fetchData())
+			}).then(() =>
+				setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId))
+			)
 		} catch (err) {
 			console.error('Error:', err)
 		}
@@ -95,9 +96,13 @@ function App() {
 					title: value,
 					isDone: isDone,
 				}),
-			})
-				.then(() => setLoading(true))
-				.then(() => fetchData())
+			}).then(() =>
+				setTasks(prevTasks =>
+					prevTasks.map(task =>
+						task.id == taskId ? { ...task, isDone: isDone } : task
+					)
+				)
+			)
 		} catch (err) {
 			console.error('Error:', err)
 		}
