@@ -1,6 +1,9 @@
 .form__wrapper {
 	display: flex;
 	justify-content: center;
+	background-color: var(--color-grey);
+	color: var(--color-primary);
+	margin-bottom: 10px;
 }
 
 .taskList__wrapper {
@@ -8,4 +11,6 @@
 	padding: 10px;
 	border: 1px solid #b9b9b9;
 	border-radius: 10px;
+	background-color: var(--color-grey);
+	color: var(--color-primary);
 }

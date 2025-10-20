@@ -1,3 +1,15 @@
+:root {
+	--color-body-background: #f4f6f8;
+	--color-white: #f4f6f8;
+	--color-grey: #222428;
+	--color-grey-light: #2d2d31;
+	--color-grey-someLight: #969696;
+	--color-primary: #dbdbdb;
+	--color-accent: #0062c0;
+	--color-accent-light: #0070da;
+	--color-errorValid: #bb3333;
+}
+
 * {
 	box-sizing: border-box;
 }
@@ -9,6 +21,7 @@ button {
 body {
 	margin: 0;
 	font-family: 'Golos Text', sans-serif;
+	background-color: var(--color-body-background);
 }
 
 li {

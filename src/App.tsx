@@ -30,6 +30,14 @@ function App() {
 		fetchData()
 	}, [])
 
+	useEffect(() => {
+		setTaskInfo({
+			all: tasks.length,
+			completed: tasks.filter(task => task.isDone).length,
+			inWork: tasks.filter(task => !task.isDone).length,
+		})
+	}, [tasks])
+
 	function submitTask(newValue: string) {
 		try {
 			console.log(newValue)
@@ -113,7 +121,6 @@ function App() {
 			<div className='form__wrapper'>
 				<TaskForm onSubmitTask={submitTask} />
 			</div>
-			<hr />
 			<div className='taskList__wrapper'>
 				<TaskList
 					tasks={tasks}

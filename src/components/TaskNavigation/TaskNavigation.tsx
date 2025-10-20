@@ -23,7 +23,7 @@ export default function TaskNavigation({
 					getFilter('all')
 				}}
 			>
-				Все задачи {tasksFilter.all}
+				Все {tasksFilter.all}
 			</button>
 			<button
 				id='inWork'
@@ -35,7 +35,7 @@ export default function TaskNavigation({
 					getFilter('inWork')
 				}}
 			>
-				Активные {tasksFilter.inWork}
+				В прогрессе {tasksFilter.inWork}
 			</button>
 			<button
 				id='completed'
@@ -47,7 +47,7 @@ export default function TaskNavigation({
 					getFilter('completed')
 				}}
 			>
-				Законченные {tasksFilter.completed}
+				Завершенные {tasksFilter.completed}
 			</button>
 		</nav>
 	)

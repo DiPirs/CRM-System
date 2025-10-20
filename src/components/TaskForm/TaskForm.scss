@@ -3,6 +3,7 @@
 	justify-content: space-between;
 	gap: 20px;
 	width: 50%;
+	padding: 10px 0;
 }
 
 .input__container {
@@ -14,19 +15,30 @@
 
 .container__input {
 	padding: 5px 8px;
-	border: 1px solid #b9b9b9;
-	border-radius: 10px;
+	border: none;
+	background-color: var(--color-grey);
+	border-bottom: 1px solid var(--color-primary);
 	font-size: 1rem;
+	color: var(--color-primary);
 	min-height: 2.5rem;
 }
 
 .form__button {
 	background: none;
-	border: 1px solid #b9b9b9;
+	background-color: var(--color-accent);
+	border: 1px solid var(--color-accent);
 	border-radius: 10px;
+	font-weight: bold;
+	color: var(--color-primary);
 	transition: 0.2s all ease-in-out;
 
 	&:hover {
-		background-color: #c5c5c5;
+		border-color: var(--color-accent-light);
+		background-color: var(--color-accent-light);
 	}
+}
+
+.valid__message {
+	color: var(--color-errorValid);
+	font-size: 12px;
 }
