@@ -7,14 +7,12 @@ interface ITaskNavigation {
 
 export default function TaskNavigation({ tasksFilter }: ITaskNavigation) {
 	return (
-		<>
-			<nav className='nav__taskList'>
-				<button className={`nav__button`}>Все задачи {tasksFilter.all}</button>
-				<button className={`nav__button`}>Активные {tasksFilter.inWork}</button>
-				<button className={`nav__button`}>
-					Законченные {tasksFilter.completed}
-				</button>
-			</nav>
-		</>
+		<nav className='nav__taskList'>
+			<button className={`nav__button`}>Все задачи {tasksFilter.all}</button>
+			<button className={`nav__button`}>Активные {tasksFilter.inWork}</button>
+			<button className={`nav__button`}>
+				Законченные {tasksFilter.completed}
+			</button>
+		</nav>
 	)
 }

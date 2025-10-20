@@ -1,25 +1,12 @@
 import { useState } from 'react'
 import './TaskForm.scss'
 
-export default function TaskForm() {
-	const [newValue, setNewValue] = useState('')
+interface ITaskForm {
+	onSubmitTask: (newValue: string) => void
+}
 
-	const submitTask = () => {
-		try {
-			fetch(`https://easydev.club/api/v1/todos`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					title: newValue,
-					isDone: false,
-				}),
-			})
-		} catch (err) {
-			console.error('Error:', err)
-		}
-	}
+export default function TaskForm({ onSubmitTask }: ITaskForm) {
+	const [newValue, setNewValue] = useState('')
 
 	return (
 		<>
@@ -27,7 +14,8 @@ export default function TaskForm() {
 				className='form__createNewTask'
 				onSubmit={e => {
 					e.preventDefault()
-					submitTask()
+					onSubmitTask(newValue)
+					setNewValue('')
 				}}
 			>
 				<label className='input__container'>
