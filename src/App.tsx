@@ -12,10 +12,13 @@ function App() {
 		completed: 0,
 		inWork: 0,
 	})
+	const [filterTask, setFilterTask] = useState('all')
 
-	const fetchData = async () => {
+	const fetchData = async (status = 'all') => {
 		try {
-			const response = await fetch('https://easydev.club/api/v1/todos')
+			const response = await fetch(
+				`https://easydev.club/api/v1/todos?filter=${status}`
+			)
 			const data: MetaResponse<Todo, TodoInfo> = await response.json()
 			setTasks(data.data)
 			setTaskInfo(data.info ?? { all: 0, completed: 0, inWork: 0 })
@@ -27,16 +30,8 @@ function App() {
 
 	useEffect(() => {
 		setLoading(true)
-		fetchData()
-	}, [])
-
-	useEffect(() => {
-		setTaskInfo({
-			all: tasks.length,
-			completed: tasks.filter(task => task.isDone).length,
-			inWork: tasks.filter(task => !task.isDone).length,
-		})
-	}, [tasks])
+		fetchData(filterTask)
+	}, [filterTask])
 
 	function submitTask(newValue: string) {
 		try {
@@ -52,7 +47,7 @@ function App() {
 				}),
 			})
 				.then(() => setLoading(true))
-				.then(() => fetchData())
+				.then(() => fetchData(filterTask))
 		} catch (err) {
 			console.error('Error:', err)
 		}
@@ -85,9 +80,12 @@ function App() {
 		try {
 			fetch(`https://easydev.club/api/v1/todos/${taskId}`, {
 				method: 'DELETE',
-			}).then(() =>
-				setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId))
-			)
+			})
+				.then(() =>
+					setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId))
+				)
+				.then(() => setLoading(true))
+				.then(() => fetchData(filterTask))
 		} catch (err) {
 			console.error('Error:', err)
 		}
@@ -104,13 +102,16 @@ function App() {
 					title: value,
 					isDone: isDone,
 				}),
-			}).then(() =>
-				setTasks(prevTasks =>
-					prevTasks.map(task =>
-						task.id == taskId ? { ...task, isDone: isDone } : task
+			})
+				.then(() =>
+					setTasks(prevTasks =>
+						prevTasks.map(task =>
+							task.id == taskId ? { ...task, isDone: isDone } : task
+						)
 					)
 				)
-			)
+				.then(() => setLoading(true))
+				.then(() => fetchData(filterTask))
 		} catch (err) {
 			console.error('Error:', err)
 		}
@@ -126,6 +127,7 @@ function App() {
 					tasks={tasks}
 					isLoading={isLoading}
 					setTasksInfo={tasksInfo}
+					setTaskFilter={getFilter => setFilterTask(getFilter)}
 					onChangeTask={changeTask}
 					onDeleteTask={deleteTask}
 					onDoneTask={doneTask}
