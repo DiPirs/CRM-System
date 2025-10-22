@@ -2,7 +2,7 @@
 	display: flex;
 	gap: 5px;
 	padding: 10px;
-	background-color: var(--color-white);
+	background-color: var(--color-grey-1);
 	border-radius: 10px;
 	justify-content: space-between;
 }
@@ -10,15 +10,16 @@
 .item__text {
 	padding: 0 5px;
 	min-height: 30px;
-	background-color: var(--color-white);
+	background-color: var(--color-grey-1);
 	border: none;
 	pointer-events: none;
 	flex-grow: 1;
 	font-size: 16px;
+	color: var(--color-white);
 }
 
 .active__input {
-	border: 1px solid var(--color-grey);
+	border: 1px solid var(--color-white);
 	border-radius: 10px;
 	pointer-events: all;
 }

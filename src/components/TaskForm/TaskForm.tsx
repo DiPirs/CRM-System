@@ -10,8 +10,9 @@ export default function TaskForm({ onSubmitTask }: ITaskForm) {
 	const [errorValid, setValid] = useState(true)
 
 	function getValidation(value: string) {
-		setNewValue(value)
-		if (value.length < 2 || value.length > 64) {
+		const trimStartValue: string = value.trimStart()
+		setNewValue(trimStartValue)
+		if (trimStartValue.length < 2 || trimStartValue.length > 64) {
 			setValid(false)
 		} else {
 			setValid(true)
@@ -34,7 +35,8 @@ export default function TaskForm({ onSubmitTask }: ITaskForm) {
 						Что вы хотели сделать{' '}
 						{!errorValid && (
 							<span className='valid__message'>
-								Текст должен быть от 2 до 64 символов
+								Текст должен быть от 2 до 64 символов и не содержать пробелов в
+								начале
 							</span>
 						)}
 					</span>

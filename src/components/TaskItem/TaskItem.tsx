@@ -10,7 +10,15 @@ export default function TaskItem({
 }: ITaskItem) {
 	const [isEditing, setIsEditing] = useState(false)
 	const [isDone, setDone] = useState(task.isDone)
-	const [inputValue, setInputValue] = useState(task.title)
+
+	const validTitle = () => {
+		if (task.title.length > 64) {
+			return task.title.slice(0, 64)
+		} else {
+			return task.title
+		}
+	}
+	const [inputValue, setInputValue] = useState(validTitle())
 
 	function enterEditMode() {
 		setIsEditing(true)
