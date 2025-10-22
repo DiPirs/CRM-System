@@ -35,14 +35,14 @@ function App() {
 
 	function submitTask(newValue: string) {
 		try {
-			console.log(newValue)
+			const trimValue: string = newValue.trimStart().trimEnd()
 			fetch(`https://easydev.club/api/v1/todos`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({
-					title: newValue,
+					title: trimValue,
 					isDone: false,
 				}),
 			})
@@ -64,13 +64,16 @@ function App() {
 					title: newValue,
 					isDone: false,
 				}),
-			}).then(() =>
-				setTasks(prevTasks =>
-					prevTasks.map(task =>
-						task.id == taskId ? { ...task, title: newValue } : task
+			})
+				.then(() =>
+					setTasks(prevTasks =>
+						prevTasks.map(task =>
+							task.id == taskId ? { ...task, title: newValue } : task
+						)
 					)
 				)
-			)
+				.then(() => setLoading(true))
+				.then(() => fetchData(filterTask))
 		} catch (err) {
 			console.error('Error:', err)
 		}
