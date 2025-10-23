@@ -2,7 +2,14 @@ import './TodoListPage.scss'
 import { useEffect, useState } from 'react'
 import TaskForm from '../components/TaskForm/TaskForm'
 import TaskList from '../components/TaskList/TaskList'
-import type { Todo, TodoInfo, MetaResponse } from '../types/task.types'
+import type { Todo, TodoInfo } from '../types/task.types'
+import {
+	changeTaskApi,
+	deleteTaskApi,
+	doneTaskApi,
+	fetchDataApi,
+	submitTaskApi,
+} from '../api/api'
 
 export default function TodoListPage() {
 	const [tasks, setTasks] = useState<Todo[]>([])
@@ -16,10 +23,10 @@ export default function TodoListPage() {
 
 	const fetchData = async (status = 'all') => {
 		try {
-			const response = await fetch(
-				`https://easydev.club/api/v1/todos?filter=${status}`
-			)
-			const data: MetaResponse<Todo, TodoInfo> = await response.json()
+			const data = await fetchDataApi(status)
+			if (!data) {
+				throw new Error('No data received from API')
+			}
 			setTasks(data.data)
 			setTaskInfo(data.info ?? { all: 0, completed: 0, inWork: 0 })
 			setLoading(false)
@@ -34,73 +41,28 @@ export default function TodoListPage() {
 	}, [filterTask])
 
 	function submitTask(newValue: string) {
-		try {
-			const trimValue: string = newValue.trimStart().trimEnd()
-			fetch(`https://easydev.club/api/v1/todos`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					title: trimValue,
-					isDone: false,
-				}),
-			})
-				.then(() => setLoading(true))
-				.then(() => fetchData(filterTask))
-		} catch (err) {
-			console.error('Error:', err)
-		}
+		const trimValue: string = newValue.trimStart().trimEnd()
+		submitTaskApi(trimValue)
+			.then(() => setLoading(true))
+			.then(() => fetchData(filterTask))
 	}
 
 	function changeTask(taskId: number, newValue: string, isDone: boolean) {
-		try {
-			fetch(`https://easydev.club/api/v1/todos/${taskId}`, {
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					title: newValue,
-					isDone: isDone,
-				}),
-			})
-				.then(() => setLoading(true))
-				.then(() => fetchData(filterTask))
-		} catch (err) {
-			console.error('Error:', err)
-		}
+		changeTaskApi(taskId, newValue, isDone)
+			.then(() => setLoading(true))
+			.then(() => fetchData(filterTask))
 	}
 
 	function deleteTask(taskId: number) {
-		try {
-			fetch(`https://easydev.club/api/v1/todos/${taskId}`, {
-				method: 'DELETE',
-			})
-				.then(() => setLoading(true))
-				.then(() => fetchData(filterTask))
-		} catch (err) {
-			console.error('Error:', err)
-		}
+		deleteTaskApi(taskId)
+			.then(() => setLoading(true))
+			.then(() => fetchData(filterTask))
 	}
 
 	function doneTask(taskId: number, value: string, isDone: boolean) {
-		try {
-			fetch(`https://easydev.club/api/v1/todos/${taskId}`, {
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					title: value,
-					isDone: isDone,
-				}),
-			})
-				.then(() => setLoading(true))
-				.then(() => fetchData(filterTask))
-		} catch (err) {
-			console.error('Error:', err)
-		}
+		doneTaskApi(taskId, value, isDone)
+			.then(() => setLoading(true))
+			.then(() => fetchData(filterTask))
 	}
 
 	return (
