@@ -1,11 +1,18 @@
 import { useState } from 'react'
 import './TaskForm.scss'
+import { submitTaskApi } from '../../api/api'
 
 interface ITaskForm {
-	onSubmitTask: (newValue: string) => void
+	onFetchData: (status: string) => void
+	setFilterTask: string
+	getLoading: (getLoading: boolean) => void
 }
 
-export default function TaskForm({ onSubmitTask }: ITaskForm) {
+export default function TaskForm({
+	onFetchData,
+	setFilterTask,
+	getLoading,
+}: ITaskForm) {
 	const [newValue, setNewValue] = useState('')
 	const [errorValid, setValid] = useState(true)
 
@@ -18,6 +25,14 @@ export default function TaskForm({ onSubmitTask }: ITaskForm) {
 			setValid(true)
 		}
 	}
+
+	function handleSubmitTask(newValue: string) {
+		const trimValue: string = newValue.trimStart().trimEnd()
+		submitTaskApi(trimValue)
+			.then(() => getLoading(true))
+			.then(() => onFetchData(setFilterTask))
+	}
+
 	return (
 		<>
 			<form
@@ -25,7 +40,7 @@ export default function TaskForm({ onSubmitTask }: ITaskForm) {
 				onSubmit={e => {
 					e.preventDefault()
 					if (errorValid) {
-						onSubmitTask(newValue)
+						handleSubmitTask(newValue)
 						setNewValue('')
 					}
 				}}

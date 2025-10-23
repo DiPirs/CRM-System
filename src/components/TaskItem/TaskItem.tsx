@@ -1,19 +1,20 @@
-import { useState } from 'react'
 import './TaskItem.scss'
+import { useState } from 'react'
 import type { Todo } from '../../types/task.types'
+import { changeTaskApi, deleteTaskApi, doneTaskApi } from '../../api/api'
 
 interface ITaskItem {
 	task: Todo
-	onChange: (newValue: string, isDone: boolean) => void
-	onDelete: (taskId: number) => void
-	onDone: (isDone: boolean) => void
+	onFetchData: (status: string) => void
+	setFilterTask: string
+	getLoading: (statusLoading: boolean) => void
 }
 
 export default function TaskItem({
 	task,
-	onChange,
-	onDelete,
-	onDone,
+	onFetchData,
+	setFilterTask,
+	getLoading,
 }: ITaskItem) {
 	const [isEditing, setIsEditing] = useState(false)
 	const [isDone, setDone] = useState(task.isDone)
@@ -31,31 +32,48 @@ export default function TaskItem({
 		}
 	}
 
-	function enterEditMode() {
+	function handlerEnterEditMode() {
 		setIsEditing(true)
 		setSaveInput(inputValue)
 	}
 
-	function doneTask() {
-		setDone(!isDone)
-		onDone(!isDone)
-	}
-
-	function acceptChanges() {
-		if (errorValid) {
-			setIsEditing(false)
-			onChange(inputValue, isDone)
-		}
-	}
-
-	function cancelEdit() {
+	function handlerCancelEdit() {
 		setIsEditing(false)
 		setInputValue(saveInput)
 		setValid(true)
 	}
 
-	function deleteTask() {
-		onDelete(task.id)
+	function handlerAcceptChanges(
+		taskId: number,
+		newValue: string,
+		isDone: boolean
+	) {
+		if (errorValid) {
+			setIsEditing(false)
+			changeTaskApi(taskId, newValue, isDone)
+				.then(() => getLoading(true))
+				.then(() => onFetchData(setFilterTask))
+		}
+	}
+
+	function handlerDoneTask(taskId: number, value: string) {
+		let done = true
+		if (isDone == false) {
+			done = true
+			setDone(true)
+		} else {
+			done = false
+			setDone(false)
+		}
+		doneTaskApi(taskId, value, done)
+			.then(() => getLoading(true))
+			.then(() => onFetchData(setFilterTask))
+	}
+
+	function handlerDeleteTask(taskId: number) {
+		deleteTaskApi(taskId)
+			.then(() => getLoading(true))
+			.then(() => onFetchData(setFilterTask))
 	}
 
 	return (
@@ -65,7 +83,7 @@ export default function TaskItem({
 				type='checkbox'
 				className='item__check'
 				checked={isDone}
-				onChange={doneTask}
+				onChange={() => handlerDoneTask(task.id, inputValue)}
 			/>
 			<div className='item__text-container'>
 				{!errorValid && (
@@ -89,7 +107,7 @@ export default function TaskItem({
 				{!isEditing && (
 					<button
 						className='item__button'
-						onClick={enterEditMode}
+						onClick={handlerEnterEditMode}
 						id={`item__edit_${task.id}`}
 					>
 						<img src='/editing.svg' alt='редактировать задачу' />
@@ -99,17 +117,23 @@ export default function TaskItem({
 					<>
 						<button
 							className='item__button'
-							onClick={acceptChanges}
+							onClick={() => handlerAcceptChanges(task.id, inputValue, isDone)}
 							id={`item__accept_${task.id}`}
 						>
 							<img src='/accept.svg' alt='подтвердить редактирование' />
 						</button>
-						<button className='item__button item__cancel' onClick={cancelEdit}>
+						<button
+							className='item__button item__cancel'
+							onClick={handlerCancelEdit}
+						>
 							<img src='/cancel.svg' alt='отменить редактирование' />
 						</button>
 					</>
 				)}
-				<button className='item__button item__del' onClick={deleteTask}>
+				<button
+					className='item__button item__del'
+					onClick={() => handlerDeleteTask(task.id)}
+				>
 					<img src='/delete.svg' alt='удалить задачу' />
 				</button>
 			</div>

@@ -1,6 +1,6 @@
+import './TaskList.scss'
 import TaskItem from '../TaskItem/TaskItem'
 import TaskNavigation from '../TaskNavigation/TaskNavigation'
-import './TaskList.scss'
 import type { Todo, TodoInfo } from '../../types/task.types'
 
 interface ITaskList {
@@ -8,9 +8,9 @@ interface ITaskList {
 	isLoading: boolean
 	setTasksInfo: TodoInfo
 	setTaskFilter: (getFilter: string) => void
-	onChangeTask: (taskId: number, newValue: string, isDone: boolean) => void
-	onDeleteTask: (taskId: number) => void
-	onDoneTask: (taskId: number, value: string, isDone: boolean) => void
+	onFetchData: (status: string) => void
+	setFilterTask: string
+	getLoading: (getLoading: boolean) => void
 }
 
 export default function TaskList({
@@ -18,9 +18,9 @@ export default function TaskList({
 	isLoading,
 	setTasksInfo,
 	setTaskFilter,
-	onChangeTask,
-	onDeleteTask,
-	onDoneTask,
+	onFetchData,
+	setFilterTask,
+	getLoading,
 }: ITaskList) {
 	return (
 		<>
@@ -39,11 +39,9 @@ export default function TaskList({
 						<TaskItem
 							key={task.id}
 							task={task}
-							onChange={(newValue, isDone) =>
-								onChangeTask(task.id, newValue, isDone)
-							}
-							onDelete={taskId => onDeleteTask(taskId)}
-							onDone={isDone => onDoneTask(task.id, task.title, isDone)}
+							onFetchData={onFetchData}
+							setFilterTask={setFilterTask}
+							getLoading={statusLoading => getLoading(statusLoading)}
 						/>
 					))}
 				</ul>
