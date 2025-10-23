@@ -1,6 +1,13 @@
 import { useState } from 'react'
 import './TaskItem.scss'
-import type { ITaskItem } from '../../types/task.types'
+import type { Todo } from '../../types/task.types'
+
+interface ITaskItem {
+	task: Todo
+	onChange: (newValue: string, isDone: boolean) => void
+	onDelete: (taskId: number) => void
+	onDone: (isDone: boolean) => void
+}
 
 export default function TaskItem({
 	task,
@@ -10,18 +17,23 @@ export default function TaskItem({
 }: ITaskItem) {
 	const [isEditing, setIsEditing] = useState(false)
 	const [isDone, setDone] = useState(task.isDone)
+	const [inputValue, setInputValue] = useState(task.title)
+	const [errorValid, setValid] = useState(true)
+	const [saveInput, setSaveInput] = useState('')
 
-	const validTitle = () => {
-		if (task.title.length > 64) {
-			return task.title.slice(0, 64)
+	function getValidation(value: string) {
+		const trimStartValue: string = value.trimStart()
+		setInputValue(trimStartValue)
+		if (trimStartValue.length < 2 || trimStartValue.length > 64) {
+			setValid(false)
 		} else {
-			return task.title
+			setValid(true)
 		}
 	}
-	const [inputValue, setInputValue] = useState(validTitle())
 
 	function enterEditMode() {
 		setIsEditing(true)
+		setSaveInput(inputValue)
 	}
 
 	function doneTask() {
@@ -30,12 +42,16 @@ export default function TaskItem({
 	}
 
 	function acceptChanges() {
-		setIsEditing(false)
-		onChange(inputValue)
+		if (errorValid) {
+			setIsEditing(false)
+			onChange(inputValue, isDone)
+		}
 	}
 
 	function cancelEdit() {
 		setIsEditing(false)
+		setInputValue(saveInput)
+		setValid(true)
 	}
 
 	function deleteTask() {
@@ -51,15 +67,23 @@ export default function TaskItem({
 				checked={isDone}
 				onChange={doneTask}
 			/>
-			<input
-				id={`${task.id}`}
-				className={`item__text ${isEditing ? 'active__input' : ''} ${
-					isDone ? 'done__task' : ''
-				}`}
-				type='text'
-				value={inputValue}
-				onChange={e => setInputValue(e.target.value)}
-			/>
+			<div className='item__text-container'>
+				{!errorValid && (
+					<span className='valid__message'>
+						Текст должен быть от 2 до 64 символов и не содержать пробелов в
+						начале
+					</span>
+				)}
+				<input
+					id={`${task.id}`}
+					className={`item__text ${isEditing ? 'active__input' : ''} ${
+						isDone ? 'done__task' : ''
+					} ${!errorValid ? 'error__valid' : ''}`}
+					type='text'
+					value={inputValue}
+					onChange={e => getValidation(e.target.value)}
+				/>
+			</div>
 
 			<div className='item__buttons'>
 				{!isEditing && (

@@ -7,13 +7,20 @@
 	justify-content: space-between;
 }
 
+.item__text-container {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	gap: 5px;
+}
+
 .item__text {
 	padding: 0 5px;
-	min-height: 30px;
+	min-height: 70%;
+	height: 100%;
 	background-color: var(--color-grey-1);
 	border: none;
 	pointer-events: none;
-	flex-grow: 1;
 	font-size: 16px;
 	color: var(--color-white);
 }

@@ -5,13 +5,6 @@ export interface Todo {
 	isDone: boolean
 }
 
-export interface ITaskItem {
-	task: Todo
-	onChange: (newValue: string) => void
-	onDelete: (taskId: number) => void
-	onDone: (isDone: boolean) => void
-}
-
 export interface TodoInfo {
 	all: number
 	completed: number

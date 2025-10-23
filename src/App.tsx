@@ -53,7 +53,7 @@ function App() {
 		}
 	}
 
-	function changeTask(taskId: number, newValue: string) {
+	function changeTask(taskId: number, newValue: string, isDone: boolean) {
 		try {
 			fetch(`https://easydev.club/api/v1/todos/${taskId}`, {
 				method: 'PUT',
@@ -62,16 +62,9 @@ function App() {
 				},
 				body: JSON.stringify({
 					title: newValue,
-					isDone: false,
+					isDone: isDone,
 				}),
 			})
-				.then(() =>
-					setTasks(prevTasks =>
-						prevTasks.map(task =>
-							task.id == taskId ? { ...task, title: newValue } : task
-						)
-					)
-				)
 				.then(() => setLoading(true))
 				.then(() => fetchData(filterTask))
 		} catch (err) {
@@ -84,9 +77,6 @@ function App() {
 			fetch(`https://easydev.club/api/v1/todos/${taskId}`, {
 				method: 'DELETE',
 			})
-				.then(() =>
-					setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId))
-				)
 				.then(() => setLoading(true))
 				.then(() => fetchData(filterTask))
 		} catch (err) {
@@ -106,13 +96,6 @@ function App() {
 					isDone: isDone,
 				}),
 			})
-				.then(() =>
-					setTasks(prevTasks =>
-						prevTasks.map(task =>
-							task.id == taskId ? { ...task, isDone: isDone } : task
-						)
-					)
-				)
 				.then(() => setLoading(true))
 				.then(() => fetchData(filterTask))
 		} catch (err) {
