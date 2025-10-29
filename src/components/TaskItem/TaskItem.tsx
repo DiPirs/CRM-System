@@ -1,112 +1,87 @@
-import './TaskItem.scss'
 import { useState } from 'react'
 import type { Todo } from '../../types/task.types'
-import { changeTaskApi, deleteTaskApi, doneTaskApi } from '../../api/api'
+import { deleteTodo, updateTodo } from '../../api/api'
+import validateTodoText from '../../utils/validate'
+import style from './TaskItem.module.scss'
 
 interface ITaskItem {
 	task: Todo
-	onFetchData: (status: string) => void
-	setFilterTask: string
-	getLoading: (statusLoading: boolean) => void
+	onFetchData: () => void
 }
 
-export default function TaskItem({
-	task,
-	onFetchData,
-	setFilterTask,
-	getLoading,
-}: ITaskItem) {
-	const [isEditing, setIsEditing] = useState(false)
-	const [isDone, setDone] = useState(task.isDone)
-	const [inputValue, setInputValue] = useState(task.title)
-	const [errorValid, setValid] = useState(true)
-	const [saveInput, setSaveInput] = useState('')
+export default function TaskItem({ task, onFetchData }: ITaskItem) {
+	const [isEditing, setIsEditing] = useState<boolean>(false)
+	const [inputValue, setInputValue] = useState<string>(task.title)
+	const [approveValid, setValid] = useState<boolean>(true)
+	const [saveInput, setSaveInput] = useState<string>('')
 
-	function getValidation(value: string) {
-		const trimStartValue: string = value.trimStart()
-		setInputValue(trimStartValue)
-		if (trimStartValue.length < 2 || trimStartValue.length > 64) {
-			setValid(false)
-		} else {
-			setValid(true)
-		}
-	}
-
-	function handlerEnterEditMode() {
+	function handlerEnterEditMode(): void {
 		setIsEditing(true)
 		setSaveInput(inputValue)
 	}
 
-	function handlerCancelEdit() {
+	function handlerCancelEdit(): void {
 		setIsEditing(false)
 		setInputValue(saveInput)
 		setValid(true)
 	}
 
-	function handlerAcceptChanges(
-		taskId: number,
-		newValue: string,
-		isDone: boolean
-	) {
-		if (errorValid) {
-			setIsEditing(false)
-			changeTaskApi(taskId, newValue, isDone)
-				.then(() => getLoading(true))
-				.then(() => onFetchData(setFilterTask))
-		}
+	function handlerDoneTask(): void {
+		updateTodo(task.id, { isDone: !task.isDone })
+			.then(() => onFetchData())
+			.catch(err => alert(err))
 	}
 
-	function handlerDoneTask(taskId: number, value: string) {
-		let done = true
-		if (isDone == false) {
-			done = true
-			setDone(true)
-		} else {
-			done = false
-			setDone(false)
-		}
-		doneTaskApi(taskId, value, done)
-			.then(() => getLoading(true))
-			.then(() => onFetchData(setFilterTask))
+	function handlerDeleteTask(): void {
+		deleteTodo(task.id)
+			.then(() => onFetchData())
+			.catch(err => alert(err))
 	}
 
-	function handlerDeleteTask(taskId: number) {
-		deleteTaskApi(taskId)
-			.then(() => getLoading(true))
-			.then(() => onFetchData(setFilterTask))
+	function handlerChangeTodo(e: React.FormEvent<HTMLFormElement>): void {
+		e.preventDefault()
+		const trimValue: string = inputValue.trim()
+		const validStatus: boolean = validateTodoText(trimValue)
+		setValid(validStatus)
+		if (validStatus) {
+			updateTodo(task.id, { title: trimValue })
+				.then(() => onFetchData())
+				.catch(err => alert(err))
+		}
 	}
 
 	return (
-		<li className='toDoList__item'>
+		<li className={style.toDoList__item}>
 			<input
 				name='checkbox'
 				type='checkbox'
-				className='item__check'
-				checked={isDone}
-				onChange={() => handlerDoneTask(task.id, inputValue)}
+				className={style.item__check}
+				checked={task.isDone}
+				onChange={handlerDoneTask}
 			/>
-			<div className='item__text-container'>
-				{!errorValid && (
-					<span className='valid__message'>
-						Текст должен быть от 2 до 64 символов и не содержать пробелов в
-						начале
-					</span>
-				)}
-				<input
-					id={`${task.id}`}
-					className={`item__text ${isEditing ? 'active__input' : ''} ${
-						isDone ? 'done__task' : ''
-					} ${!errorValid ? 'error__valid' : ''}`}
-					type='text'
-					value={inputValue}
-					onChange={e => getValidation(e.target.value)}
-				/>
-			</div>
-
-			<div className='item__buttons'>
+			<form className={style.toDoItemText} onSubmit={handlerChangeTodo}>
+				<div className={style.item__text_container}>
+					{!approveValid && (
+						<span className={style.valid__message}>
+							Текст должен быть от 2 до 64 символов и не содержать пробелов в
+							начале
+						</span>
+					)}
+					<input
+						id={`${task.id}`}
+						className={`${style.item__text} ${
+							isEditing ? `${style.active__input}` : ''
+						} ${task.isDone ? `${style.done__task}` : ''} ${
+							!approveValid ? `${style.error__valid}` : ''
+						}`}
+						type='text'
+						value={inputValue}
+						onChange={e => setInputValue(e.target.value)}
+					/>
+				</div>
 				{!isEditing && (
 					<button
-						className='item__button'
+						className={style.item__button}
 						onClick={handlerEnterEditMode}
 						id={`item__edit_${task.id}`}
 					>
@@ -116,27 +91,28 @@ export default function TaskItem({
 				{isEditing && (
 					<>
 						<button
-							className='item__button'
-							onClick={() => handlerAcceptChanges(task.id, inputValue, isDone)}
+							className={style.item__button}
 							id={`item__accept_${task.id}`}
 						>
 							<img src='/accept.svg' alt='подтвердить редактирование' />
 						</button>
 						<button
-							className='item__button item__cancel'
+							className={`${style.item__button} ${style.item__cancel}`}
 							onClick={handlerCancelEdit}
 						>
 							<img src='/cancel.svg' alt='отменить редактирование' />
 						</button>
 					</>
 				)}
-				<button
-					className='item__button item__del'
-					onClick={() => handlerDeleteTask(task.id)}
-				>
-					<img src='/delete.svg' alt='удалить задачу' />
-				</button>
-			</div>
+			</form>
+
+			<button
+				className={`${style.item__button} ${style.item__del}`}
+				id={`item__delete_${task.id}`}
+				onClick={handlerDeleteTask}
+			>
+				<img src='/delete.svg' alt='удалить задачу' />
+			</button>
 		</li>
 	)
 }

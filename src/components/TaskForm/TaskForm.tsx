@@ -1,72 +1,59 @@
-import { useState } from 'react'
-import './TaskForm.scss'
-import { submitTaskApi } from '../../api/api'
+import React, { useState } from 'react'
+import { createTodo } from '../../api/api'
+import validateTodoText from '../../utils/validate'
+import style from './TaskForm.module.scss'
 
 interface ITaskForm {
-	onFetchData: (status: string) => void
-	setFilterTask: string
-	getLoading: (getLoading: boolean) => void
+	onFetchData: () => void
+	setLoading: (isLoading: boolean) => void
 }
 
-export default function TaskForm({
-	onFetchData,
-	setFilterTask,
-	getLoading,
-}: ITaskForm) {
-	const [newValue, setNewValue] = useState('')
-	const [errorValid, setValid] = useState(true)
+export default function TaskForm({ onFetchData, setLoading }: ITaskForm) {
+	const [newValue, setNewValue] = useState<string>('')
+	const [approveValid, setValid] = useState<boolean>(true)
 
-	function getValidation(value: string) {
-		const trimStartValue: string = value.trimStart()
-		setNewValue(trimStartValue)
-		if (trimStartValue.length < 2 || trimStartValue.length > 64) {
-			setValid(false)
-		} else {
-			setValid(true)
+	function handleSubmitTask(e: React.FormEvent<HTMLFormElement>): void {
+		e.preventDefault()
+		const trimValue: string = newValue.trim()
+		const validStatus: boolean = validateTodoText(trimValue)
+		setValid(validStatus)
+		if (validStatus) {
+			setNewValue('')
+			createTodo({ title: trimValue })
+				.then(() => setLoading(true))
+				.then(() => onFetchData())
+				.catch(err => alert(err))
 		}
 	}
 
-	function handleSubmitTask(newValue: string) {
-		const trimValue: string = newValue.trimStart().trimEnd()
-		submitTaskApi(trimValue)
-			.then(() => getLoading(true))
-			.then(() => onFetchData(setFilterTask))
-	}
-
 	return (
-		<>
-			<form
-				className='form__createNewTask'
-				onSubmit={e => {
-					e.preventDefault()
-					if (errorValid) {
-						handleSubmitTask(newValue)
-						setNewValue('')
-					}
-				}}
-			>
-				<label className='input__container'>
-					<span className='container__description'>
-						Что вы хотели сделать{' '}
-						{!errorValid && (
-							<span className='valid__message'>
-								Текст должен быть от 2 до 64 символов и не содержать пробелов в
-								начале
-							</span>
-						)}
-					</span>
-					<input
-						name='input__task'
-						type='text'
-						placeholder='Введите задачу...'
-						className='container__input'
-						value={newValue}
-						onChange={e => getValidation(e.target.value)}
-						required
-					/>
-				</label>
-				<button className='form__button button_submitTask'>Добавить</button>
-			</form>
-		</>
+		<form
+			className={style.form__createNewTask}
+			onSubmit={e => handleSubmitTask(e)}
+		>
+			<label className={style.input__container}>
+				<span className={style.container__description}>
+					Что вы хотели сделать{' '}
+					{!approveValid && (
+						<span className={style.valid__message}>
+							Текст должен быть от 2 до 64 символов и не содержать пробелов в
+							начале
+						</span>
+					)}
+				</span>
+				<input
+					name='input__task'
+					type='text'
+					placeholder='Введите задачу...'
+					className={style.container__input}
+					value={newValue}
+					onChange={e => setNewValue(e.target.value)}
+					required
+				/>
+			</label>
+			<button className={`${style.form__button} ${style.button_submitTask}`}>
+				Добавить
+			</button>
+		</form>
 	)
 }

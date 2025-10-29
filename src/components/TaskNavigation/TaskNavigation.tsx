@@ -1,53 +1,51 @@
 import { useState } from 'react'
-import type { TodoInfo } from '../../types/task.types'
-import './TaskNavigation.scss'
+import type { FilterTodo, TodoInfo } from '../../types/task.types'
+import style from './TaskNavigation.module.scss'
 
 interface ITaskNavigation {
-	tasksFilter: TodoInfo
-	getFilter: (fil: string) => void
+	todoFilter: TodoInfo
+	setFilter: (fil: FilterTodo) => void
 }
 
 export default function TaskNavigation({
-	tasksFilter,
-	getFilter,
+	todoFilter,
+	setFilter,
 }: ITaskNavigation) {
 	const [isActive, setActive] = useState('all')
 
+	function switchTodoFilter(typeToDo: FilterTodo): void {
+		setActive(`${typeToDo}`)
+		setFilter(`${typeToDo}`)
+	}
+
 	return (
-		<nav className='nav__taskList'>
+		<nav className={style.nav__taskList}>
 			<button
 				id='all'
-				className={`nav__button ${isActive === 'all' ? 'active__button' : ''}`}
-				onClick={() => {
-					setActive('all')
-					getFilter('all')
-				}}
+				className={`${style.nav__button} ${
+					isActive === 'all' ? style.active__button : ''
+				}`}
+				onClick={() => switchTodoFilter('all')}
 			>
-				Все {tasksFilter.all}
+				Все {todoFilter.all}
 			</button>
 			<button
 				id='inWork'
-				className={`nav__button ${
-					isActive === 'inWork' ? 'active__button' : ''
+				className={`${style.nav__button} ${
+					isActive === 'inWork' ? `${style.active__button}` : ''
 				}`}
-				onClick={() => {
-					setActive('inWork')
-					getFilter('inWork')
-				}}
+				onClick={() => switchTodoFilter('inWork')}
 			>
-				В прогрессе {tasksFilter.inWork}
+				В прогрессе {todoFilter.inWork}
 			</button>
 			<button
 				id='completed'
-				className={`nav__button ${
-					isActive === 'completed' ? 'active__button' : ''
+				className={`${style.nav__button} ${
+					isActive === 'completed' ? `${style.active__button}` : ''
 				}`}
-				onClick={() => {
-					setActive('completed')
-					getFilter('completed')
-				}}
+				onClick={() => switchTodoFilter('completed')}
 			>
-				Завершенные {tasksFilter.completed}
+				Завершенные {todoFilter.completed}
 			</button>
 		</nav>
 	)

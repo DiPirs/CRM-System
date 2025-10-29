@@ -1,5 +1,5 @@
 import './App.scss'
-import TodoListPage from './pages/TodoListPage'
+import TodoListPage from './pages/TodoListPage/TodoListPage'
 
 function App() {
 	return (

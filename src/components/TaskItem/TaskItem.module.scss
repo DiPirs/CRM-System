@@ -7,7 +7,12 @@
 	justify-content: space-between;
 }
 
-.item__text-container {
+.toDoItemText {
+	display: flex;
+	flex-grow: 1;
+}
+
+.item__text_container {
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
@@ -33,6 +38,7 @@
 
 .item__button {
 	display: flex;
+	align-content: center;
 	justify-content: center;
 	padding: 10px;
 	background: none;
@@ -45,12 +51,11 @@
 	}
 }
 
-.item__buttons {
-	display: flex;
-	gap: 10px;
-}
-
 .done__task {
 	text-decoration: line-through;
 	color: var(--color-grey-someLight);
+}
+
+.item__del {
+	background-color: var(--color-red-someDark);
 }

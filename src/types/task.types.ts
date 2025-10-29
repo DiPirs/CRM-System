@@ -18,3 +18,7 @@ export interface MetaResponse<T, N> {
 		totalAmount: number
 	}
 }
+
+export type FilterTodo = 'all' | 'inWork' | 'completed'
+export type TodoRequest = Partial<Omit<Todo, 'id' | 'created'>>
+export type CreateTodo = Pick<Todo, 'title'>

@@ -1,100 +1,93 @@
-import type { MetaResponse, Todo, TodoInfo } from '../types/task.types'
+import type {
+	Todo,
+	TodoInfo,
+	MetaResponse,
+	FilterTodo,
+	TodoRequest,
+	CreateTodo,
+} from '../types/task.types'
 
-export const fetchDataApi = async (status = 'all') => {
-	try {
-		const response = await fetch(
-			`https://easydev.club/api/v1/todos?filter=${status}`
-		)
-		const data: MetaResponse<Todo, TodoInfo> = await response.json()
-		return data
-	} catch (err) {
-		console.error('Error:', err)
-	}
-}
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
-export const submitTaskApi = async (newTitle: string) => {
-	try {
-		const response = await fetch(`https://easydev.club/api/v1/todos`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				title: newTitle,
-				isDone: false,
-			}),
+let httpError: number = 0
+
+export const fetchTodo = async (
+	status: FilterTodo = 'all'
+): Promise<MetaResponse<Todo, TodoInfo>> => {
+	return fetch(`${API_BASE_URL}/todos?filter=${status}`)
+		.then(response => {
+			if (!response.ok) {
+				httpError = response.status
+			}
+			return response.json()
 		})
-		return response.json()
-	} catch (err) {
-		console.error('Error:', err)
-	}
+		.then((data: MetaResponse<Todo, TodoInfo>) => {
+			return data
+		})
+		.catch(() => {
+			throw new Error(
+				`Something error in fetchData task, try again.\nError code: ${httpError}`
+			)
+		})
 }
 
-export const changeTaskApi = async (
+export const createTodo = async (createData: CreateTodo): Promise<void> => {
+	return fetch(`${API_BASE_URL}/todos`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(createData),
+	})
+		.then(response => {
+			if (!response.ok) {
+				httpError = response.status
+			}
+			return response.json()
+		})
+		.catch(() => {
+			throw new Error(
+				`Something error in submit task, try again.\nError code: ${httpError}`
+			)
+		})
+}
+
+export const updateTodo = async (
 	taskId: number,
-	newValue: string,
-	isDone: boolean
-) => {
-	try {
-		const response = await fetch(
-			`https://easydev.club/api/v1/todos/${taskId}`,
-			{
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					title: newValue,
-					isDone: isDone,
-				}),
+	updateData: TodoRequest
+): Promise<void> => {
+	return fetch(`${API_BASE_URL}/todos/${taskId}`, {
+		method: 'PUT',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(updateData),
+	})
+		.then(response => {
+			if (!response.ok) {
+				httpError = response.status
 			}
-		)
-		return response.json()
-	} catch (err) {
-		console.error('Error:', err)
-	}
+			return response.json()
+		})
+		.catch(() => {
+			throw new Error(
+				`Something error in change task, try again.\nError code: ${httpError}`
+			)
+		})
 }
 
-export const deleteTaskApi = async (taskId: number) => {
-	try {
-		const response = await fetch(
-			`https://easydev.club/api/v1/todos/${taskId}`,
-			{
-				method: 'DELETE',
+export const deleteTodo = async (taskId: number): Promise<void> => {
+	return fetch(`${API_BASE_URL}/todos/${taskId}`, {
+		method: 'DELETE',
+	})
+		.then(response => {
+			if (!response.ok) {
+				httpError = response.status
 			}
-		)
-
-		if (!response.ok) {
-			throw new Error(`Failed to delete task. Status: ${response.status}`)
-		}
-
-		return { success: true }
-	} catch (err) {
-		console.error('Error:', err)
-	}
-}
-
-export const doneTaskApi = async (
-	taskId: number,
-	value: string,
-	isDone: boolean
-) => {
-	try {
-		const response = await fetch(
-			`https://easydev.club/api/v1/todos/${taskId}`,
-			{
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					title: value,
-					isDone: isDone,
-				}),
-			}
-		)
-		return response.json()
-	} catch (err) {
-		console.error(err)
-	}
+		})
+		.catch(() => {
+			throw new Error(
+				`Something error in delete task, try again.\nError code: ${httpError}`
+			)
+		})
 }
