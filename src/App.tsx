@@ -1,7 +1,12 @@
-import './App.css'
+import './App.scss'
+import TodoListPage from './pages/TodoListPage/TodoListPage'
 
 function App() {
-	return <>Hello init</>
+	return (
+		<>
+			<TodoListPage />
+		</>
+	)
 }
 
 export default App
