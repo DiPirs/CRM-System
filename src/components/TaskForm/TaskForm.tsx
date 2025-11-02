@@ -5,10 +5,9 @@ import style from './TaskForm.module.scss'
 
 interface ITaskForm {
 	onFetchData: () => void
-	setLoading: (isLoading: boolean) => void
 }
 
-export default function TaskForm({ onFetchData, setLoading }: ITaskForm) {
+export default function TaskForm({ onFetchData }: ITaskForm) {
 	const [newValue, setNewValue] = useState<string>('')
 	const [approveValid, setValid] = useState<boolean>(true)
 
@@ -18,10 +17,9 @@ export default function TaskForm({ onFetchData, setLoading }: ITaskForm) {
 		const validStatus: boolean = validateTodoText(trimValue)
 		setValid(validStatus)
 		if (validStatus) {
-			setNewValue('')
 			createTodo({ title: trimValue })
-				.then(() => setLoading(true))
 				.then(() => onFetchData())
+				.then(() => setNewValue(''))
 				.catch(err => alert(err))
 		}
 	}

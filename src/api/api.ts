@@ -9,24 +9,19 @@ import type {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
-let httpError: number = 0
-
 export const fetchTodo = async (
 	status: FilterTodo = 'all'
 ): Promise<MetaResponse<Todo, TodoInfo>> => {
 	return fetch(`${API_BASE_URL}/todos?filter=${status}`)
 		.then(response => {
-			if (!response.ok) {
-				httpError = response.status
-			}
 			return response.json()
 		})
 		.then((data: MetaResponse<Todo, TodoInfo>) => {
 			return data
 		})
-		.catch(() => {
+		.catch(err => {
 			throw new Error(
-				`Something error in fetchData task, try again.\nError code: ${httpError}`
+				`Something error in fetchData task, try again.\nError: ` + err
 			)
 		})
 }
@@ -40,14 +35,11 @@ export const createTodo = async (createData: CreateTodo): Promise<void> => {
 		body: JSON.stringify(createData),
 	})
 		.then(response => {
-			if (!response.ok) {
-				httpError = response.status
-			}
 			return response.json()
 		})
-		.catch(() => {
+		.catch(err => {
 			throw new Error(
-				`Something error in submit task, try again.\nError code: ${httpError}`
+				`Something error in submit task, try again.\nError: ` + err
 			)
 		})
 }
@@ -64,30 +56,19 @@ export const updateTodo = async (
 		body: JSON.stringify(updateData),
 	})
 		.then(response => {
-			if (!response.ok) {
-				httpError = response.status
-			}
 			return response.json()
 		})
-		.catch(() => {
+		.catch(err => {
 			throw new Error(
-				`Something error in change task, try again.\nError code: ${httpError}`
+				`Something error in change task, try again.\nError: ` + err
 			)
 		})
 }
 
-export const deleteTodo = async (taskId: number): Promise<void> => {
+export const deleteTodo = async (taskId: number): Promise<Response> => {
 	return fetch(`${API_BASE_URL}/todos/${taskId}`, {
 		method: 'DELETE',
+	}).catch(err => {
+		throw new Error(`Something error in delete task, try again.\nError: ` + err)
 	})
-		.then(response => {
-			if (!response.ok) {
-				httpError = response.status
-			}
-		})
-		.catch(() => {
-			throw new Error(
-				`Something error in delete task, try again.\nError code: ${httpError}`
-			)
-		})
 }

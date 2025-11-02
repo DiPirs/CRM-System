@@ -35,7 +35,7 @@ export default function TodoListPage() {
 	return (
 		<>
 			<div className={style.formNewTodo}>
-				<TaskForm onFetchData={fetchData} setLoading={setLoading} />
+				<TaskForm onFetchData={fetchData} />
 			</div>
 			<div className={style.page}>
 				<h1 className={style.h1}>Мои задачи</h1>
