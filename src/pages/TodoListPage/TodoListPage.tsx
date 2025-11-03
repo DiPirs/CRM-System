@@ -2,10 +2,10 @@ import style from './TodoListPage.module.scss'
 import { useCallback, useEffect, useState } from 'react'
 import type { FilterTodo, Todo, TodoInfo } from '../../types/task.types'
 import { fetchTodo } from '../../api/api'
-import TaskForm from '../../components/TaskForm/TaskForm'
-import TaskList from '../../components/TaskList/TaskList'
-import TaskNavigation from '../../components/TaskNavigation/TaskNavigation'
 import { DEFAULT_INFO } from '../../utils/constants'
+import TodoForm from '../../components/TodoForm/TodoForm'
+import TodoList from '../../components/TodoList/TodoList'
+import TodoNavigation from '../../components/TodoNavigation/TodoNavigation'
 
 export default function TodoListPage() {
 	const [tasks, setTasks] = useState<Todo[]>([])
@@ -35,16 +35,16 @@ export default function TodoListPage() {
 	return (
 		<>
 			<div className={style.formNewTodo}>
-				<TaskForm onFetchData={fetchData} />
+				<TodoForm onFetchData={fetchData} />
 			</div>
 			<div className={style.page}>
 				<h1 className={style.h1}>Мои задачи</h1>
 				<hr className={style.hr} />
 				<div className={style.toDoNavigation}>
-					<TaskNavigation todoFilter={tasksInfo} setFilter={setFilterTask} />
+					<TodoNavigation todoFilter={tasksInfo} setFilter={setFilterTask} />
 				</div>
 				<div className={style.taskList}>
-					<TaskList
+					<TodoList
 						tasks={tasks}
 						isLoading={isLoading}
 						onFetchData={fetchData}

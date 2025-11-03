@@ -1,14 +1,14 @@
-import TaskItem from '../TaskItem/TaskItem'
+import TaskItem from '../TodoItem/TodoItem'
 import type { Todo } from '../../types/task.types'
-import style from './TaskList.module.scss'
+import style from './TodoList.module.scss'
 
-interface ITaskList {
+interface ITodoList {
 	tasks: Todo[]
 	isLoading: boolean
 	onFetchData: () => void
 }
 
-export default function TaskList({ tasks, isLoading, onFetchData }: ITaskList) {
+export default function TaskList({ tasks, isLoading, onFetchData }: ITodoList) {
 	return (
 		<>
 			{isLoading && <span>Loading</span>}

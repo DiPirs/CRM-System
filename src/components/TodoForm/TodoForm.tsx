@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 import { createTodo } from '../../api/api'
 import validateTodoText from '../../utils/validate'
-import style from './TaskForm.module.scss'
+import style from './TodoForm.module.scss'
 
-interface ITaskForm {
+interface ITodoForm {
 	onFetchData: () => void
 }
 
-export default function TaskForm({ onFetchData }: ITaskForm) {
+export default function TodoForm({ onFetchData }: ITodoForm) {
 	const [newValue, setNewValue] = useState<string>('')
 	const [approveValid, setValid] = useState<boolean>(true)
 

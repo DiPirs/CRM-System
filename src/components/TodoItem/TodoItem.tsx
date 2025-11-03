@@ -2,14 +2,14 @@ import { useState } from 'react'
 import type { Todo } from '../../types/task.types'
 import { deleteTodo, updateTodo } from '../../api/api'
 import validateTodoText from '../../utils/validate'
-import style from './TaskItem.module.scss'
+import style from './TodoItem.module.scss'
 
-interface ITaskItem {
+interface ITodoItem {
 	task: Todo
 	onFetchData: () => void
 }
 
-export default function TaskItem({ task, onFetchData }: ITaskItem) {
+export default function TodoItem({ task, onFetchData }: ITodoItem) {
 	const [isEditing, setIsEditing] = useState<boolean>(false)
 	const [inputValue, setInputValue] = useState<string>(task.title)
 	const [approveValid, setValid] = useState<boolean>(true)
