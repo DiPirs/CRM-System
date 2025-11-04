@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 import type {
 	Todo,
 	TodoInfo,
@@ -8,13 +10,13 @@ import type {
 } from '../types/task.types'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
-
 export const fetchTodo = async (
 	status: FilterTodo = 'all'
 ): Promise<MetaResponse<Todo, TodoInfo>> => {
-	return fetch(`${API_BASE_URL}/todos?filter=${status}`)
+	return axios
+		.get(`${API_BASE_URL}/todos?filter=${status}`)
 		.then(response => {
-			return response.json()
+			return response.data
 		})
 		.then((data: MetaResponse<Todo, TodoInfo>) => {
 			return data
@@ -27,15 +29,10 @@ export const fetchTodo = async (
 }
 
 export const createTodo = async (createData: CreateTodo): Promise<void> => {
-	return fetch(`${API_BASE_URL}/todos`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(createData),
-	})
+	return axios
+		.post(`${API_BASE_URL}/todos`, createData)
 		.then(response => {
-			return response.json()
+			return response.data
 		})
 		.catch(err => {
 			throw new Error(
@@ -48,15 +45,10 @@ export const updateTodo = async (
 	taskId: number,
 	updateData: TodoRequest
 ): Promise<void> => {
-	return fetch(`${API_BASE_URL}/todos/${taskId}`, {
-		method: 'PUT',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(updateData),
-	})
+	return axios
+		.put(`${API_BASE_URL}/todos/${taskId}`, updateData)
 		.then(response => {
-			return response.json()
+			return response.data
 		})
 		.catch(err => {
 			throw new Error(
@@ -66,9 +58,14 @@ export const updateTodo = async (
 }
 
 export const deleteTodo = async (taskId: number): Promise<Response> => {
-	return fetch(`${API_BASE_URL}/todos/${taskId}`, {
-		method: 'DELETE',
-	}).catch(err => {
-		throw new Error(`Something error in delete task, try again.\nError: ` + err)
-	})
+	return axios
+		.delete(`${API_BASE_URL}/todos/${taskId}`)
+		.then(response => {
+			return response.data
+		})
+		.catch(err => {
+			throw new Error(
+				`Something error in delete task, try again.\nError: ` + err
+			)
+		})
 }
