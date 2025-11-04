@@ -9,7 +9,7 @@ import TodoNavigation from '../../components/TodoNavigation/TodoNavigation'
 
 interface ITodoListPage {
 	setActiveFilter: FilterTodo
-	getActiveFilter: (fil: FilterTodo) => void
+	getActiveFilter: (filt: FilterTodo) => void
 }
 
 export default function TodoListPage({
