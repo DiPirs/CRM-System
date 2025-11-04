@@ -3,6 +3,7 @@ import { createTodo } from '../../api/api'
 import type { FormInstance } from 'antd'
 import { Button, Form, Input, Space } from 'antd'
 import { useEffect, useState } from 'react'
+import { ClearOutlined, EditOutlined } from '@ant-design/icons'
 
 interface SubmitButtonProps {
 	form: FormInstance
@@ -61,15 +62,22 @@ export default function TodoForm({ onFetchData }: ITodoForm) {
 				setNewValue(changedValues.todoText)
 			}}
 		>
+			<span style={{ fontSize: '18px' }}>Что вы хотели сделать</span>
 			<Form.Item
 				name='todoText'
-				label='Что вы хотели сделать'
 				rules={[
+					{ required: true, message: 'Поле обязательно для заполнения' },
 					{
-						required: true,
-						min: 2,
-						max: 64,
-						message: 'Задача должна быть от 2 до 64 символов',
+						validator: (_, value) => {
+							if (!value || value.trim().length < 2) {
+								return Promise.reject(
+									new Error(
+										'Задача должна быть от 2 (без учета пробелов) до 64 символов'
+									)
+								)
+							}
+							return Promise.resolve()
+						},
 					},
 				]}
 				style={{ flexGrow: '1' }}
@@ -78,8 +86,14 @@ export default function TodoForm({ onFetchData }: ITodoForm) {
 			</Form.Item>
 			<Form.Item>
 				<Space style={{ display: 'flex', justifyContent: 'center' }}>
-					<SubmitButton form={form}>Submit</SubmitButton>
-					<Button htmlType='reset'>Reset</Button>
+					<SubmitButton form={form}>
+						<EditOutlined />
+						Создать задачу
+					</SubmitButton>
+					<Button htmlType='reset'>
+						<ClearOutlined />
+						Очистить поле
+					</Button>
 				</Space>
 			</Form.Item>
 		</Form>

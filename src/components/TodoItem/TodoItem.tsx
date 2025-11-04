@@ -1,29 +1,31 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Todo } from '../../types/task.types'
 import { deleteTodo, updateTodo } from '../../api/api'
-import validateTodoText from '../../utils/validate'
 import style from './TodoItem.module.scss'
+import { Checkbox } from 'antd'
+import type { FormInstance } from 'antd'
+import { Button, Form, Input, Space } from 'antd'
 
 interface ITodoItem {
 	task: Todo
 	onFetchData: () => void
 }
 
+interface TodoFormValues {
+	todoItemText?: string
+}
+
 export default function TodoItem({ task, onFetchData }: ITodoItem) {
 	const [isEditing, setIsEditing] = useState<boolean>(false)
-	const [inputValue, setInputValue] = useState<string>(task.title)
-	const [approveValid, setValid] = useState<boolean>(true)
-	const [saveInput, setSaveInput] = useState<string>('')
+	const [form] = Form.useForm()
 
 	function handlerEnterEditMode(): void {
 		setIsEditing(true)
-		setSaveInput(inputValue)
 	}
 
 	function handlerCancelEdit(): void {
 		setIsEditing(false)
-		setInputValue(saveInput)
-		setValid(true)
+		form.resetFields()
 	}
 
 	function handlerDoneTask(): void {
@@ -38,81 +40,132 @@ export default function TodoItem({ task, onFetchData }: ITodoItem) {
 			.catch(err => alert(err))
 	}
 
-	function handlerChangeTodo(e: React.FormEvent<HTMLFormElement>): void {
-		e.preventDefault()
-		const trimValue: string = inputValue.trim()
-		const validStatus: boolean = validateTodoText(trimValue)
-		setValid(validStatus)
-		if (validStatus) {
-			updateTodo(task.id, { title: trimValue })
-				.then(() => onFetchData())
-				.catch(err => alert(err))
-		}
+	function handlerChangeTodo(values: TodoFormValues): void {
+		updateTodo(task.id, { title: values.todoItemText?.trim() })
+			.then(() => onFetchData())
+			.then(() => setIsEditing(false))
+			.catch(err => alert(err))
+	}
+
+	interface SubmitButtonProps {
+		form: FormInstance
+	}
+
+	const SubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = ({
+		form,
+		children,
+	}) => {
+		const [submittable, setSubmittable] = useState<boolean>(false)
+
+		const values = Form.useWatch([], form)
+
+		useEffect(() => {
+			form
+				.validateFields({ validateOnly: true })
+				.then(() => setSubmittable(true))
+				.catch(() => setSubmittable(false))
+		}, [form, values])
+
+		return (
+			<Button type='primary' htmlType='submit' disabled={!submittable}>
+				{children}
+			</Button>
+		)
 	}
 
 	return (
-		<li className={style.toDoList__item}>
-			<input
-				name='checkbox'
-				type='checkbox'
-				className={style.item__check}
-				checked={task.isDone}
-				onChange={handlerDoneTask}
-			/>
-			<form className={style.toDoItemText} onSubmit={handlerChangeTodo}>
-				<div className={style.item__text_container}>
-					{!approveValid && (
-						<span className={style.valid__message}>
-							Текст должен быть от 2 до 64 символов и не содержать пробелов в
-							начале
-						</span>
-					)}
-					<input
-						id={`${task.id}`}
-						className={`${style.item__text} ${
-							isEditing ? `${style.active__input}` : ''
-						} ${task.isDone ? `${style.done__task}` : ''} ${
-							!approveValid ? `${style.error__valid}` : ''
-						}`}
-						type='text'
-						value={inputValue}
-						onChange={e => setInputValue(e.target.value)}
-					/>
-				</div>
-				{!isEditing && (
-					<button
-						className={style.item__button}
-						onClick={handlerEnterEditMode}
-						id={`item__edit_${task.id}`}
+		<li className={style.li}>
+			<div className={style.toDoList__item}>
+				<Checkbox onChange={handlerDoneTask} checked={task.isDone} />
+				<Form
+					form={form}
+					name={`todoItemForm-${task.id}`}
+					layout='vertical'
+					autoComplete='off'
+					style={{
+						display: 'flex',
+						gap: '10px',
+						flexGrow: '2',
+					}}
+					initialValues={{ todoItemText: `${task.title}` }}
+					onFinish={handlerChangeTodo}
+				>
+					<Form.Item
+						name='todoItemText'
+						rules={[
+							{ required: true, message: 'Поле обязательно для заполнения' },
+							{
+								validator: (_, value) => {
+									if (!value || value.trim().length < 2) {
+										return Promise.reject(
+											new Error(
+												'Задача должна быть от 2 (без учета пробелов) до 64 символов'
+											)
+										)
+									}
+									return Promise.resolve()
+								},
+							},
+						]}
+						style={{ flexGrow: '1', margin: 0 }}
 					>
-						<img src='/editing.svg' alt='редактировать задачу' />
-					</button>
-				)}
-				{isEditing && (
-					<>
-						<button
-							className={style.item__button}
-							id={`item__accept_${task.id}`}
-						>
-							<img src='/accept.svg' alt='подтвердить редактирование' />
-						</button>
-						<button
-							className={`${style.item__button} ${style.item__cancel}`}
-							onClick={handlerCancelEdit}
-						>
-							<img src='/cancel.svg' alt='отменить редактирование' />
-						</button>
-					</>
-				)}
-			</form>
-
-			<button
-				className={`${style.item__button} ${style.item__del}`}
-				id={`item__delete_${task.id}`}
-				onClick={handlerDeleteTask}
-			>
-				<img src='/delete.svg' alt='удалить задачу' />
-			</button>
+						{!isEditing && (
+							<Input
+								style={{
+									pointerEvents: 'none',
+									border: 'none',
+									background: 'none',
+									color: 'var(--color-white)',
+								}}
+							/>
+						)}
+						{isEditing && (
+							<Input
+								style={{
+									border: '1px solid var(--color-white)',
+									backgroundColor: 'var(--color-grey-1)',
+									color: 'var(--color-white)',
+								}}
+							/>
+						)}
+					</Form.Item>
+					<Form.Item
+						style={{
+							display: 'flex',
+							justifyContent: 'center',
+							alignItems: 'center',
+							margin: 0,
+						}}
+					>
+						<Space>
+							{!isEditing && (
+								<Button onClick={handlerEnterEditMode}>
+									<img src='/editing.svg' alt='редактировать задачу' />
+								</Button>
+							)}
+							{isEditing && (
+								<>
+									<SubmitButton form={form}>
+										<img src='/accept.svg' alt='подтвердить редактирование' />
+									</SubmitButton>
+									<Button onClick={handlerCancelEdit}>
+										<img src='/cancel.svg' alt='отменить редактирование' />
+									</Button>
+								</>
+							)}
+							<Button
+								onClick={handlerDeleteTask}
+								style={{
+									backgroundColor: 'var(--color-red-someDark)',
+									border: 'none',
+								}}
+							>
+								<img src='/delete.svg' alt='удалить задачу' />
+							</Button>
+						</Space>
+					</Form.Item>
+				</Form>
+			</div>
 		</li>
 	)
 }

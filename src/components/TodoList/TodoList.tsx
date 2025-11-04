@@ -1,5 +1,5 @@
-import TaskItem from '../TodoItem/TodoItem'
 import type { Todo } from '../../types/task.types'
+import TodoItem from '../TodoItem/TodoItem'
 import style from './TodoList.module.scss'
 
 interface ITodoList {
@@ -15,7 +15,7 @@ export default function TaskList({ tasks, isLoading, onFetchData }: ITodoList) {
 			{!isLoading && (
 				<ul className={style.toDoList}>
 					{tasks.map(task => (
-						<TaskItem key={task.id} task={task} onFetchData={onFetchData} />
+						<TodoItem key={task.id} task={task} onFetchData={onFetchData} />
 					))}
 				</ul>
 			)}
