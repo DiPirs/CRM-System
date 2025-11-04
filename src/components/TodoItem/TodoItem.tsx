@@ -114,7 +114,10 @@ export default function TodoItem({ task, onFetchData }: ITodoItem) {
 								pointerEvents: 'none',
 								border: 'none',
 								background: 'none',
-								color: 'var(--color-white)',
+								color: task.isDone
+									? 'var(--color-grey-someLight)'
+									: 'var(--color-white)',
+								textDecoration: task.isDone ? 'line-through' : 'none',
 							}}
 						/>
 					)}

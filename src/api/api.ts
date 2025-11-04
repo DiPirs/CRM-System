@@ -11,7 +11,7 @@ import type {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 export const fetchTodo = async (
-	status: FilterTodo = 'all'
+	status: FilterTodo
 ): Promise<MetaResponse<Todo, TodoInfo>> => {
 	return axios
 		.get(`${API_BASE_URL}/todos?filter=${status}`)
