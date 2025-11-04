@@ -1,6 +1,6 @@
 import type { Todo } from '../../types/task.types'
 import TodoItem from '../TodoItem/TodoItem'
-import style from './TodoList.module.scss'
+import { List } from 'antd'
 
 interface ITodoList {
 	tasks: Todo[]
@@ -13,11 +13,23 @@ export default function TaskList({ tasks, isLoading, onFetchData }: ITodoList) {
 		<>
 			{isLoading && <span>Loading</span>}
 			{!isLoading && (
-				<ul className={style.toDoList}>
-					{tasks.map(task => (
-						<TodoItem key={task.id} task={task} onFetchData={onFetchData} />
-					))}
-				</ul>
+				<List
+					bordered
+					dataSource={tasks}
+					style={{ border: 'none' }}
+					renderItem={item => (
+						<List.Item
+							style={{
+								display: 'flex',
+								border: '2px solid var(--color-grey-1)',
+								borderRadius: '10px',
+								marginBottom: '10px',
+							}}
+						>
+							<TodoItem key={item.id} task={item} onFetchData={onFetchData} />
+						</List.Item>
+					)}
+				/>
 			)}
 		</>
 	)

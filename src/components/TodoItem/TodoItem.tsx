@@ -74,98 +74,96 @@ export default function TodoItem({ task, onFetchData }: ITodoItem) {
 	}
 
 	return (
-		<li className={style.li}>
-			<div className={style.toDoList__item}>
-				<Checkbox onChange={handlerDoneTask} checked={task.isDone} />
-				<Form
-					form={form}
-					name={`todoItemForm-${task.id}`}
-					layout='vertical'
-					autoComplete='off'
+		<div className={style.toDoList__item}>
+			<Checkbox onChange={handlerDoneTask} checked={task.isDone} />
+			<Form
+				form={form}
+				name={`todoItemForm-${task.id}`}
+				layout='vertical'
+				autoComplete='off'
+				style={{
+					display: 'flex',
+					gap: '10px',
+					flexGrow: '2',
+				}}
+				initialValues={{ todoItemText: `${task.title}` }}
+				onFinish={handlerChangeTodo}
+			>
+				<Form.Item
+					name='todoItemText'
+					rules={[
+						{ required: true, message: 'Поле обязательно для заполнения' },
+						{
+							validator: (_, value) => {
+								if (!value || value.trim().length < 2) {
+									return Promise.reject(
+										new Error(
+											'Задача должна быть от 2 (без учета пробелов) до 64 символов'
+										)
+									)
+								}
+								return Promise.resolve()
+							},
+						},
+					]}
+					style={{ flexGrow: '1', margin: 0 }}
+				>
+					{!isEditing && (
+						<Input
+							style={{
+								pointerEvents: 'none',
+								border: 'none',
+								background: 'none',
+								color: 'var(--color-white)',
+							}}
+						/>
+					)}
+					{isEditing && (
+						<Input
+							style={{
+								border: '1px solid var(--color-white)',
+								backgroundColor: 'var(--color-grey-1)',
+								color: 'var(--color-white)',
+							}}
+						/>
+					)}
+				</Form.Item>
+				<Form.Item
 					style={{
 						display: 'flex',
-						gap: '10px',
-						flexGrow: '2',
+						justifyContent: 'center',
+						alignItems: 'center',
+						margin: 0,
 					}}
-					initialValues={{ todoItemText: `${task.title}` }}
-					onFinish={handlerChangeTodo}
 				>
-					<Form.Item
-						name='todoItemText'
-						rules={[
-							{ required: true, message: 'Поле обязательно для заполнения' },
-							{
-								validator: (_, value) => {
-									if (!value || value.trim().length < 2) {
-										return Promise.reject(
-											new Error(
-												'Задача должна быть от 2 (без учета пробелов) до 64 символов'
-											)
-										)
-									}
-									return Promise.resolve()
-								},
-							},
-						]}
-						style={{ flexGrow: '1', margin: 0 }}
-					>
+					<Space>
 						{!isEditing && (
-							<Input
-								style={{
-									pointerEvents: 'none',
-									border: 'none',
-									background: 'none',
-									color: 'var(--color-white)',
-								}}
-							/>
+							<Button onClick={handlerEnterEditMode}>
+								<img src='/editing.svg' alt='редактировать задачу' />
+							</Button>
 						)}
 						{isEditing && (
-							<Input
-								style={{
-									border: '1px solid var(--color-white)',
-									backgroundColor: 'var(--color-grey-1)',
-									color: 'var(--color-white)',
-								}}
-							/>
-						)}
-					</Form.Item>
-					<Form.Item
-						style={{
-							display: 'flex',
-							justifyContent: 'center',
-							alignItems: 'center',
-							margin: 0,
-						}}
-					>
-						<Space>
-							{!isEditing && (
-								<Button onClick={handlerEnterEditMode}>
-									<img src='/editing.svg' alt='редактировать задачу' />
+							<>
+								<SubmitButton form={form}>
+									<img src='/accept.svg' alt='подтвердить редактирование' />
+								</SubmitButton>
+								<Button onClick={handlerCancelEdit}>
+									<img src='/cancel.svg' alt='отменить редактирование' />
 								</Button>
-							)}
-							{isEditing && (
-								<>
-									<SubmitButton form={form}>
-										<img src='/accept.svg' alt='подтвердить редактирование' />
-									</SubmitButton>
-									<Button onClick={handlerCancelEdit}>
-										<img src='/cancel.svg' alt='отменить редактирование' />
-									</Button>
-								</>
-							)}
-							<Button
-								onClick={handlerDeleteTask}
-								style={{
-									backgroundColor: 'var(--color-red-someDark)',
-									border: 'none',
-								}}
-							>
-								<img src='/delete.svg' alt='удалить задачу' />
-							</Button>
-						</Space>
-					</Form.Item>
-				</Form>
-			</div>
-		</li>
+							</>
+						)}
+						<Button
+							onClick={handlerDeleteTask}
+							style={{
+								backgroundColor: 'var(--color-red-someDark)',
+								border: 'none',
+							}}
+						>
+							<img src='/delete.svg' alt='удалить задачу' />
+						</Button>
+					</Space>
+				</Form.Item>
+			</Form>
+		</div>
 	)
 }

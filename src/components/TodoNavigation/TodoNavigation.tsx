@@ -1,3 +1,4 @@
+import './TodoNavigation.scss'
 import type { FilterTodo, TodoInfo } from '../../types/task.types'
 import { Menu } from 'antd'
 import {
@@ -45,8 +46,7 @@ export default function TodoNavigation({
 			<Menu
 				onClick={switchTodoFilter}
 				style={{ display: `flex`, fontSize: '18px', background: 'none' }}
-				defaultSelectedKeys={['/']}
-				defaultOpenKeys={['sub1']}
+				defaultSelectedKeys={['all']}
 				mode='inline'
 				theme='dark'
 				items={items}

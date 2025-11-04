@@ -41,16 +41,8 @@ export default function TodoListPage() {
 			<div className={style.page}>
 				<h1 className={style.h1}>Мои задачи</h1>
 				<hr className={style.hr} />
-				<div className={style.toDoNavigation}>
-					<TodoNavigation todoFilter={tasksInfo} setFilter={setFilterTask} />
-				</div>
-				<div className={style.taskList}>
-					<TodoList
-						tasks={tasks}
-						isLoading={isLoading}
-						onFetchData={fetchData}
-					/>
-				</div>
+				<TodoNavigation todoFilter={tasksInfo} setFilter={setFilterTask} />
+				<TodoList tasks={tasks} isLoading={isLoading} onFetchData={fetchData} />
 			</div>
 		</>
 	)

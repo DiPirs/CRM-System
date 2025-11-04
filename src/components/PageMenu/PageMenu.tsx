@@ -6,8 +6,8 @@ import { useNavigate } from 'react-router-dom'
 type MenuItem = Required<MenuProps>['items'][number]
 
 const items: MenuItem[] = [
-	{ key: '/', icon: <PieChartOutlined />, label: 'Todo List' },
-	{ key: '/account', icon: <DesktopOutlined />, label: 'My account' },
+	{ key: '/', icon: <PieChartOutlined />, label: 'Задачи' },
+	{ key: '/account', icon: <DesktopOutlined />, label: 'Профиль' },
 ]
 
 export default function PageMenu() {
