@@ -1,5 +1,4 @@
 import type { FilterTodo, TodoInfo } from '../../types/task.types'
-import style from './TodoNavigation.module.scss'
 import { Menu } from 'antd'
 import {
 	CalendarOutlined,
@@ -42,7 +41,7 @@ export default function TodoNavigation({
 	}
 
 	return (
-		<nav className={style.nav__taskList}>
+		<nav className='nav__taskList'>
 			<Menu
 				onClick={switchTodoFilter}
 				style={{ display: `flex`, fontSize: '18px', background: 'none' }}

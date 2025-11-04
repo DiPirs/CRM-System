@@ -37,6 +37,7 @@ export default function TodoListPage() {
 			<div className={style.formNewTodo}>
 				<TodoForm onFetchData={fetchData} />
 			</div>
+			<hr className={style.hr} />
 			<div className={style.page}>
 				<h1 className={style.h1}>Мои задачи</h1>
 				<hr className={style.hr} />

@@ -1,57 +1,87 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { createTodo } from '../../api/api'
-import validateTodoText from '../../utils/validate'
-import style from './TodoForm.module.scss'
+import type { FormInstance } from 'antd'
+import { Button, Form, Input, Space } from 'antd'
+import { useEffect, useState } from 'react'
+
+interface SubmitButtonProps {
+	form: FormInstance
+}
 
 interface ITodoForm {
 	onFetchData: () => void
 }
 
+const SubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = ({
+	form,
+	children,
+}) => {
+	const [submittable, setSubmittable] = useState<boolean>(false)
+
+	const values = Form.useWatch([], form)
+
+	useEffect(() => {
+		form
+			.validateFields({ validateOnly: true })
+			.then(() => setSubmittable(true))
+			.catch(() => setSubmittable(false))
+	}, [form, values])
+
+	return (
+		<Button type='primary' htmlType='submit' disabled={!submittable}>
+			{children}
+		</Button>
+	)
+}
+
 export default function TodoForm({ onFetchData }: ITodoForm) {
 	const [newValue, setNewValue] = useState<string>('')
-	const [approveValid, setValid] = useState<boolean>(true)
+	const [form] = Form.useForm()
 
-	function handleSubmitTask(e: React.FormEvent<HTMLFormElement>): void {
-		e.preventDefault()
-		const trimValue: string = newValue.trim()
-		const validStatus: boolean = validateTodoText(trimValue)
-		setValid(validStatus)
-		if (validStatus) {
-			createTodo({ title: trimValue })
-				.then(() => onFetchData())
-				.then(() => setNewValue(''))
-				.catch(err => alert(err))
-		}
+	function handleSubmitTask(): void {
+		createTodo({ title: newValue })
+			.then(() => onFetchData())
+			.then(() => setNewValue(''))
+			.catch(err => alert(err))
 	}
 
 	return (
-		<form
-			className={style.form__createNewTask}
-			onSubmit={e => handleSubmitTask(e)}
+		<Form
+			form={form}
+			name='validateOnly'
+			layout='vertical'
+			autoComplete='off'
+			style={{
+				display: 'flex',
+				flexDirection: 'column',
+				flexGrow: '2',
+			}}
+			onFinish={handleSubmitTask}
+			onValuesChange={changedValues => {
+				setNewValue(changedValues.todoText)
+			}}
 		>
-			<label className={style.input__container}>
-				<span className={style.container__description}>
-					Что вы хотели сделать{' '}
-					{!approveValid && (
-						<span className={style.valid__message}>
-							Текст должен быть от 2 до 64 символов и не содержать пробелов в
-							начале
-						</span>
-					)}
-				</span>
-				<input
-					name='input__task'
-					type='text'
-					placeholder='Введите задачу...'
-					className={style.container__input}
-					value={newValue}
-					onChange={e => setNewValue(e.target.value)}
-					required
-				/>
-			</label>
-			<button className={`${style.form__button} ${style.button_submitTask}`}>
-				Добавить
-			</button>
-		</form>
+			<Form.Item
+				name='todoText'
+				label='Что вы хотели сделать'
+				rules={[
+					{
+						required: true,
+						min: 2,
+						max: 64,
+						message: 'Задача должна быть от 2 до 64 символов',
+					},
+				]}
+				style={{ flexGrow: '1' }}
+			>
+				<Input />
+			</Form.Item>
+			<Form.Item>
+				<Space style={{ display: 'flex', justifyContent: 'center' }}>
+					<SubmitButton form={form}>Submit</SubmitButton>
+					<Button htmlType='reset'>Reset</Button>
+				</Space>
+			</Form.Item>
+		</Form>
 	)
 }
