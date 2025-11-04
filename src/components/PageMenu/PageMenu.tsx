@@ -7,7 +7,7 @@ type MenuItem = Required<MenuProps>['items'][number]
 
 const items: MenuItem[] = [
 	{ key: '/', icon: <PieChartOutlined />, label: 'Задачи' },
-	{ key: '/account', icon: <DesktopOutlined />, label: 'Профиль' },
+	{ key: '/profile', icon: <DesktopOutlined />, label: 'Профиль' },
 ]
 
 export default function PageMenu() {
@@ -24,7 +24,6 @@ export default function PageMenu() {
 					onClick={onClick}
 					style={{ minHeight: '100vh' }}
 					defaultSelectedKeys={['/']}
-					defaultOpenKeys={['sub1']}
 					mode='inline'
 					theme='dark'
 					items={items}

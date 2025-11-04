@@ -6,9 +6,15 @@ interface ITodoList {
 	tasks: Todo[]
 	isLoading: boolean
 	onFetchData: () => void
+	getPaused: (status: boolean) => void
 }
 
-export default function TaskList({ tasks, isLoading, onFetchData }: ITodoList) {
+export default function TaskList({
+	tasks,
+	isLoading,
+	onFetchData,
+	getPaused,
+}: ITodoList) {
 	return (
 		<>
 			{isLoading && <span>Loading</span>}
@@ -26,7 +32,12 @@ export default function TaskList({ tasks, isLoading, onFetchData }: ITodoList) {
 								marginBottom: '10px',
 							}}
 						>
-							<TodoItem key={item.id} task={item} onFetchData={onFetchData} />
+							<TodoItem
+								key={item.id}
+								task={item}
+								onFetchData={onFetchData}
+								getPaused={getPaused}
+							/>
 						</List.Item>
 					)}
 				/>

@@ -68,8 +68,13 @@ export default function TodoForm({ onFetchData }: ITodoForm) {
 				rules={[
 					{ required: true, message: 'Поле обязательно для заполнения' },
 					{
+						min: 2,
+						max: 64,
+						message: '',
+					},
+					{
 						validator: (_, value) => {
-							if (!value || value.trim().length < 2) {
+							if (!value || value.trim().length < 2 || value.length > 64) {
 								return Promise.reject(
 									new Error(
 										'Задача должна быть от 2 (без учета пробелов) до 64 символов'

@@ -12,12 +12,14 @@ type MenuItem = Required<MenuProps>['items'][number]
 
 interface ITodoNavigation {
 	todoFilter: TodoInfo
-	setFilter: (fil: FilterTodo) => void
+	setFilter: FilterTodo
+	getFilter: (fil: FilterTodo) => void
 }
 
 export default function TodoNavigation({
 	todoFilter,
 	setFilter,
+	getFilter,
 }: ITodoNavigation) {
 	const items: MenuItem[] = [
 		{
@@ -38,7 +40,7 @@ export default function TodoNavigation({
 	]
 	const switchTodoFilter: MenuProps['onClick'] = e => {
 		const path: FilterTodo = e.key as FilterTodo
-		setFilter(`${path}`)
+		getFilter(`${path}`)
 	}
 
 	return (
@@ -46,7 +48,7 @@ export default function TodoNavigation({
 			<Menu
 				onClick={switchTodoFilter}
 				style={{ display: `flex`, fontSize: '18px', background: 'none' }}
-				defaultSelectedKeys={['all']}
+				defaultSelectedKeys={[`${setFilter}`]}
 				mode='inline'
 				theme='dark'
 				items={items}

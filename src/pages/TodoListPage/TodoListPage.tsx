@@ -7,16 +7,26 @@ import TodoForm from '../../components/TodoForm/TodoForm'
 import TodoList from '../../components/TodoList/TodoList'
 import TodoNavigation from '../../components/TodoNavigation/TodoNavigation'
 
-export default function TodoListPage() {
+interface ITodoListPage {
+	setActiveFilter: FilterTodo
+	getActiveFilter: (fil: FilterTodo) => void
+}
+
+export default function TodoListPage({
+	setActiveFilter,
+	getActiveFilter,
+}: ITodoListPage) {
 	const [tasks, setTasks] = useState<Todo[]>([])
 	const [isLoading, setLoading] = useState<boolean>(false)
-	const [filterTask, setFilterTask] = useState<FilterTodo>('all')
+	const [filterTask, setFilterTask] = useState<FilterTodo>(setActiveFilter)
 	const [tasksInfo, setTaskInfo] = useState<TodoInfo>(DEFAULT_INFO)
+	const [isPaused, setPaused] = useState(false)
 	const filterTaskRef = useRef(filterTask)
 
 	useEffect(() => {
 		filterTaskRef.current = filterTask
-	}, [filterTask])
+		getActiveFilter(filterTaskRef.current)
+	}, [filterTask, getActiveFilter])
 
 	const fetchData = useCallback(
 		async (fil?: FilterTodo): Promise<void> => {
@@ -42,13 +52,16 @@ export default function TodoListPage() {
 
 	useEffect(() => {
 		const intervalFetch = setInterval(() => {
+			if (isPaused) {
+				return
+			}
 			fetchData(filterTaskRef.current)
 		}, 5000)
 
 		return () => {
 			clearInterval(intervalFetch)
 		}
-	}, [fetchData])
+	}, [fetchData, isPaused])
 
 	return (
 		<>
@@ -59,8 +72,17 @@ export default function TodoListPage() {
 			<div className={style.page}>
 				<h1 className={style.h1}>Мои задачи</h1>
 				<hr className={style.hr} />
-				<TodoNavigation todoFilter={tasksInfo} setFilter={setFilterTask} />
-				<TodoList tasks={tasks} isLoading={isLoading} onFetchData={fetchData} />
+				<TodoNavigation
+					todoFilter={tasksInfo}
+					getFilter={setFilterTask}
+					setFilter={setActiveFilter}
+				/>
+				<TodoList
+					tasks={tasks}
+					isLoading={isLoading}
+					onFetchData={fetchData}
+					getPaused={setPaused}
+				/>
 			</div>
 		</>
 	)
