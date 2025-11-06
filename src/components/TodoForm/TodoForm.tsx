@@ -35,14 +35,13 @@ const SubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = ({
 	)
 }
 
-export default function TodoForm({ onFetchData }: ITodoForm) {
-	const [newValue, setNewValue] = useState<string>('')
+export default React.memo(function TodoForm({ onFetchData }: ITodoForm) {
 	const [form] = Form.useForm()
 
 	function handleSubmitTask(): void {
-		createTodo({ title: newValue })
+		createTodo({ title: form.getFieldValue(`todoText`) })
 			.then(() => onFetchData())
-			.then(() => setNewValue(''))
+			.then(() => form.setFieldValue('todoText', ''))
 			.catch(err => alert(err))
 	}
 
@@ -58,9 +57,6 @@ export default function TodoForm({ onFetchData }: ITodoForm) {
 				flexGrow: '2',
 			}}
 			onFinish={handleSubmitTask}
-			onValuesChange={changedValues => {
-				setNewValue(changedValues.todoText)
-			}}
 		>
 			<span style={{ fontSize: '18px' }}>Что вы хотели сделать</span>
 			<Form.Item
@@ -103,4 +99,4 @@ export default function TodoForm({ onFetchData }: ITodoForm) {
 			</Form.Item>
 		</Form>
 	)
-}
+})

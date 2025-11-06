@@ -10,11 +10,21 @@ import type {
 } from '../types/task.types'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+
+const apiClient = axios.create({
+	baseURL: API_BASE_URL,
+	headers: {
+		'Content-Type': 'application/json',
+	},
+})
+
 export const fetchTodo = async (
 	status: FilterTodo
 ): Promise<MetaResponse<Todo, TodoInfo>> => {
-	return axios
-		.get(`${API_BASE_URL}/todos?filter=${status}`)
+	return apiClient
+		.get('todos', {
+			params: { filter: status },
+		})
 		.then(response => {
 			return response.data
 		})
@@ -29,8 +39,8 @@ export const fetchTodo = async (
 }
 
 export const createTodo = async (createData: CreateTodo): Promise<void> => {
-	return axios
-		.post(`${API_BASE_URL}/todos`, createData)
+	return apiClient
+		.post('todos', createData)
 		.then(response => {
 			return response.data
 		})
@@ -45,8 +55,8 @@ export const updateTodo = async (
 	taskId: number,
 	updateData: TodoRequest
 ): Promise<void> => {
-	return axios
-		.put(`${API_BASE_URL}/todos/${taskId}`, updateData)
+	return apiClient
+		.put(`todos/${taskId}`, updateData)
 		.then(response => {
 			return response.data
 		})
@@ -58,8 +68,8 @@ export const updateTodo = async (
 }
 
 export const deleteTodo = async (taskId: number): Promise<Response> => {
-	return axios
-		.delete(`${API_BASE_URL}/todos/${taskId}`)
+	return apiClient
+		.delete(`todos/${taskId}`)
 		.then(response => {
 			return response.data
 		})

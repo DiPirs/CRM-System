@@ -1,7 +1,7 @@
 import { DesktopOutlined, PieChartOutlined } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import { Menu } from 'antd'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 type MenuItem = Required<MenuProps>['items'][number]
 
@@ -12,6 +12,7 @@ const items: MenuItem[] = [
 
 export default function PageMenu() {
 	const navigate = useNavigate()
+	const location = useLocation()
 
 	const onClick: MenuProps['onClick'] = e => {
 		const path = e.key
@@ -23,7 +24,7 @@ export default function PageMenu() {
 				<Menu
 					onClick={onClick}
 					style={{ minHeight: '100vh' }}
-					defaultSelectedKeys={['/']}
+					selectedKeys={[location.pathname]}
 					mode='inline'
 					theme='dark'
 					items={items}

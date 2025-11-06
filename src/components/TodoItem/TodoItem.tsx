@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import React from 'react'
 import type { Todo } from '../../types/task.types'
 import { deleteTodo, updateTodo } from '../../api/api'
 import style from './TodoItem.module.scss'
@@ -16,7 +17,11 @@ interface TodoFormValues {
 	todoItemText?: string
 }
 
-export default function TodoItem({ task, onFetchData, getPaused }: ITodoItem) {
+export default React.memo(function TodoItem({
+	task,
+	onFetchData,
+	getPaused,
+}: ITodoItem) {
 	const [isEditing, setIsEditing] = useState<boolean>(false)
 	const [form] = Form.useForm()
 
@@ -177,4 +182,4 @@ export default function TodoItem({ task, onFetchData, getPaused }: ITodoItem) {
 			</Form>
 		</div>
 	)
-}
+})
