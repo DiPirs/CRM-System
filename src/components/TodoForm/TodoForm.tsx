@@ -1,102 +1,100 @@
-import React from 'react'
 import { createTodo } from '../../api/api'
-import type { FormInstance } from 'antd'
-import { Button, Form, Input, Space } from 'antd'
-import { useEffect, useState } from 'react'
+import { Button, Form, Input, Space, notification } from 'antd'
 import { ClearOutlined, EditOutlined } from '@ant-design/icons'
+import validateTodoText from '../../utils/validate'
 
-interface SubmitButtonProps {
-	form: FormInstance
-}
-
-interface ITodoForm {
+interface TodoFormProps {
 	onFetchData: () => void
 }
 
-const SubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = ({
-	form,
-	children,
-}) => {
-	const [submittable, setSubmittable] = useState<boolean>(false)
+type NotificationType = 'success' | 'info' | 'warning' | 'error'
 
-	const values = Form.useWatch([], form)
-
-	useEffect(() => {
-		form
-			.validateFields({ validateOnly: true })
-			.then(() => setSubmittable(true))
-			.catch(() => setSubmittable(false))
-	}, [form, values])
-
-	return (
-		<Button type='primary' htmlType='submit' disabled={!submittable}>
-			{children}
-		</Button>
-	)
-}
-
-export default React.memo(function TodoForm({ onFetchData }: ITodoForm) {
+export default function TodoForm({ onFetchData }: TodoFormProps) {
 	const [form] = Form.useForm()
+	const [api, contextHolder] = notification.useNotification()
 
-	function handleSubmitTask(): void {
-		createTodo({ title: form.getFieldValue(`todoText`) })
-			.then(() => onFetchData())
-			.then(() => form.setFieldValue('todoText', ''))
-			.catch(err => alert(err))
+	const openNotificationWithIcon = (
+		type: NotificationType,
+		title: string,
+		description: string
+	) => {
+		api[type]({
+			message: `${title}`,
+			description: `${description}`,
+		})
+	}
+
+	function handleSubmitTask(values: { todoText: string }) {
+		const formValue: string = values.todoText
+		const isValidate = validateTodoText(formValue.trim())
+		if (isValidate) {
+			createTodo({ title: formValue.trim() })
+				.then(() =>
+					openNotificationWithIcon(
+						'success',
+						'Успех',
+						'Задача переведена в новый статус'
+					)
+				)
+				.then(() => onFetchData())
+				.then(() => form.setFieldValue('todoText', ''))
+				.catch(err =>
+					openNotificationWithIcon('error', 'Ошибка создания задачи', err)
+				)
+		} else {
+			form.setFields([
+				{
+					name: 'todoText',
+					errors: ['Задача должна быть от 2 символов (не считая пробелы)'],
+				},
+			])
+		}
 	}
 
 	return (
-		<Form
-			form={form}
-			name='validateOnly'
-			layout='vertical'
-			autoComplete='off'
-			style={{
-				display: 'flex',
-				flexDirection: 'column',
-				flexGrow: '2',
-			}}
-			onFinish={handleSubmitTask}
-		>
-			<span style={{ fontSize: '18px' }}>Что вы хотели сделать</span>
-			<Form.Item
-				name='todoText'
-				rules={[
-					{ required: true, message: 'Поле обязательно для заполнения' },
-					{
-						min: 2,
-						max: 64,
-						message: '',
-					},
-					{
-						validator: (_, value) => {
-							if (!value || value.trim().length < 2 || value.length > 64) {
-								return Promise.reject(
-									new Error(
-										'Задача должна быть от 2 (без учета пробелов) до 64 символов'
-									)
-								)
-							}
-							return Promise.resolve()
-						},
-					},
-				]}
-				style={{ flexGrow: '1' }}
+		<>
+			{contextHolder}
+			<Form
+				form={form}
+				name='validateOnly'
+				layout='vertical'
+				autoComplete='off'
+				style={{
+					display: 'flex',
+					flexDirection: 'column',
+					flexGrow: '2',
+				}}
+				onFinish={handleSubmitTask}
 			>
-				<Input />
-			</Form.Item>
-			<Form.Item>
-				<Space style={{ display: 'flex', justifyContent: 'center' }}>
-					<SubmitButton form={form}>
-						<EditOutlined />
-						Создать задачу
-					</SubmitButton>
-					<Button htmlType='reset'>
-						<ClearOutlined />
-						Очистить поле
-					</Button>
-				</Space>
-			</Form.Item>
-		</Form>
+				<span style={{ fontSize: '18px' }}>Что вы хотели сделать</span>
+				<Form.Item
+					name='todoText'
+					rules={[
+						{ required: true, message: 'Поле обязательно для заполнения' },
+						{
+							whitespace: true,
+							message: 'Задача не должна состоять только из пробелов',
+						},
+						{ min: 2, message: 'Задача должна быть от 2 символов' },
+						{ max: 64, message: 'Задача не должна превышать 64 символа' },
+					]}
+					style={{ flexGrow: '1' }}
+				>
+					<Input />
+				</Form.Item>
+				<Form.Item>
+					<Space style={{ display: 'flex', justifyContent: 'center' }}>
+						<Button type='primary' htmlType='submit'>
+							<EditOutlined />
+							Создать задачу
+						</Button>
+						<Button htmlType='reset'>
+							<ClearOutlined />
+							Очистить поле
+						</Button>
+					</Space>
+				</Form.Item>
+			</Form>
+		</>
 	)
-})
+}

@@ -2,34 +2,43 @@ import style from './TodoListPage.module.scss'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { FilterTodo, Todo, TodoInfo } from '../../types/task.types'
 import { fetchTodo } from '../../api/api'
-import { DEFAULT_INFO } from '../../utils/constants'
+import {
+	DEFAULT_INFO,
+	AUTO_REFRESH_TODO_INTERVAL_MS,
+} from '../../utils/constants'
 import TodoForm from '../../components/TodoForm/TodoForm'
 import TodoList from '../../components/TodoList/TodoList'
 import TodoNavigation from '../../components/TodoNavigation/TodoNavigation'
+import { notification } from 'antd'
 
-interface ITodoListPage {
-	setActiveFilter: FilterTodo
-	getActiveFilter: (fil: FilterTodo) => void
-}
+type NotificationType = 'success' | 'info' | 'warning' | 'error'
 
-export default function TodoListPage({
-	setActiveFilter,
-	getActiveFilter,
-}: ITodoListPage) {
+export default function TodoListPage() {
 	const [tasks, setTasks] = useState<Todo[]>([])
 	const [isLoading, setLoading] = useState<boolean>(false)
-	const [filterTask, setFilterTask] = useState<FilterTodo>(setActiveFilter)
+	const [filterTask, setFilterTask] = useState<FilterTodo>('all')
 	const [tasksInfo, setTaskInfo] = useState<TodoInfo>(DEFAULT_INFO)
-	const [isPaused, setPaused] = useState(false)
 	const filterTaskRef = useRef(filterTask)
+
+	const [api, contextHolder] = notification.useNotification()
+
+	const openNotificationWithIcon = (
+		type: NotificationType,
+		title: string,
+		description: string
+	) => {
+		api[type]({
+			message: `${title}`,
+			description: `${description}`,
+		})
+	}
 
 	useEffect(() => {
 		filterTaskRef.current = filterTask
-		getActiveFilter(filterTaskRef.current)
-	}, [filterTask, getActiveFilter])
+	}, [filterTask])
 
 	const fetchData = useCallback(
-		async (fil?: FilterTodo): Promise<void> => {
+		(fil?: FilterTodo): void => {
 			setLoading(true)
 			fetchTodo(fil ? fil : filterTask)
 				.then(data => {
@@ -37,7 +46,7 @@ export default function TodoListPage({
 					setTaskInfo(data.info ?? DEFAULT_INFO)
 				})
 				.catch(err => {
-					alert(err)
+					openNotificationWithIcon('error', 'Ошибка загрузки данных', err)
 				})
 				.finally(() => {
 					setLoading(false)
@@ -52,19 +61,17 @@ export default function TodoListPage({
 
 	useEffect(() => {
 		const intervalFetch = setInterval(() => {
-			if (isPaused) {
-				return
-			}
 			fetchData(filterTaskRef.current)
-		}, 5000)
+		}, AUTO_REFRESH_TODO_INTERVAL_MS)
 
 		return () => {
 			clearInterval(intervalFetch)
 		}
-	}, [fetchData, isPaused])
+	}, [fetchData])
 
 	return (
 		<>
+			{contextHolder}
 			<div className={style.formNewTodo}>
 				<TodoForm onFetchData={fetchData} />
 			</div>
@@ -72,17 +79,8 @@ export default function TodoListPage({
 			<div className={style.page}>
 				<h1 className={style.h1}>Мои задачи</h1>
 				<hr className={style.hr} />
-				<TodoNavigation
-					todoFilter={tasksInfo}
-					getFilter={setFilterTask}
-					setFilter={setActiveFilter}
-				/>
-				<TodoList
-					tasks={tasks}
-					isLoading={isLoading}
-					onFetchData={fetchData}
-					getPaused={setPaused}
-				/>
+				<TodoNavigation todoFilter={tasksInfo} getFilter={setFilterTask} />
+				<TodoList tasks={tasks} isLoading={isLoading} onFetchData={fetchData} />
 			</div>
 		</>
 	)

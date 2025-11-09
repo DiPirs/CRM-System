@@ -1,185 +1,163 @@
-import { useEffect, useState } from 'react'
-import React from 'react'
+import style from './TodoItem.module.scss'
+import { useState } from 'react'
 import type { Todo } from '../../types/task.types'
 import { deleteTodo, updateTodo } from '../../api/api'
-import style from './TodoItem.module.scss'
 import { Checkbox } from 'antd'
-import type { FormInstance } from 'antd'
-import { Button, Form, Input, Space } from 'antd'
+import { Button, Form, Input, Space, notification } from 'antd'
+import validateTodoText from '../../utils/validate'
 
-interface ITodoItem {
+interface TodoItemProps {
 	task: Todo
 	onFetchData: () => void
-	getPaused: (status: boolean) => void
 }
 
-interface TodoFormValues {
-	todoItemText?: string
-}
+type NotificationType = 'success' | 'info' | 'warning' | 'error'
 
-export default React.memo(function TodoItem({
-	task,
-	onFetchData,
-	getPaused,
-}: ITodoItem) {
+export default function TodoItem({ task, onFetchData }: TodoItemProps) {
 	const [isEditing, setIsEditing] = useState<boolean>(false)
 	const [form] = Form.useForm()
+	const [api, contextHolder] = notification.useNotification()
 
-	function handlerEnterEditMode(): void {
-		setIsEditing(true)
-		getPaused(true)
+	const openNotificationWithIcon = (
+		type: NotificationType,
+		title: string,
+		description: string
+	) => {
+		api[type]({
+			message: `${title}`,
+			description: `${description}`,
+		})
 	}
 
-	function handlerCancelEdit(): void {
+	function handleEnterEditMode() {
+		setIsEditing(true)
+	}
+
+	function handleCancelEdit() {
 		setIsEditing(false)
 		form.resetFields()
-		getPaused(false)
 	}
 
-	function handlerDoneTask(): void {
+	function handleDoneTask() {
 		updateTodo(task.id, { isDone: !task.isDone })
 			.then(() => onFetchData())
-			.catch(err => alert(err))
+			.catch(err =>
+				openNotificationWithIcon(
+					'error',
+					'Ошибка перевода задачи в новый статус',
+					err
+				)
+			)
 	}
 
-	function handlerDeleteTask(): void {
+	function handleDeleteTask() {
 		deleteTodo(task.id)
 			.then(() => onFetchData())
-			.catch(err => alert(err))
+			.catch(err =>
+				openNotificationWithIcon('error', 'Ошибка удаления задачи', err)
+			)
 	}
 
-	function handlerChangeTodo(values: TodoFormValues): void {
-		updateTodo(task.id, { title: values.todoItemText?.trim() })
-			.then(() => onFetchData())
-			.then(() => setIsEditing(false))
-			.catch(err => alert(err))
-	}
-
-	interface SubmitButtonProps {
-		form: FormInstance
-	}
-
-	const SubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = ({
-		form,
-		children,
-	}) => {
-		const [submittable, setSubmittable] = useState<boolean>(false)
-
-		const values = Form.useWatch([], form)
-
-		useEffect(() => {
-			form
-				.validateFields({ validateOnly: true })
-				.then(() => setSubmittable(true))
-				.catch(() => setSubmittable(false))
-		}, [form, values])
-
-		return (
-			<Button type='primary' htmlType='submit' disabled={!submittable}>
-				{children}
-			</Button>
-		)
+	function handleChangeTodo(values: { todoItemText: string }) {
+		const formValue: string = values.todoItemText
+		const isValidate = validateTodoText(formValue.trim())
+		if (isValidate) {
+			updateTodo(task.id, { title: formValue.trim() })
+				.then(() => onFetchData())
+				.then(() => setIsEditing(false))
+				.catch(err =>
+					openNotificationWithIcon('error', 'Ошибка изменении задачи', err)
+				)
+		} else {
+			form.setFields([
+				{
+					name: 'todoItemText',
+					errors: ['Задача должна быть от 2 символов (не считая пробелы)'],
+				},
+			])
+		}
 	}
 
 	return (
-		<div className={style.toDoList__item}>
-			<Checkbox onChange={handlerDoneTask} checked={task.isDone} />
-			<Form
-				form={form}
-				name={`todoItemForm-${task.id}`}
-				layout='vertical'
-				autoComplete='off'
-				style={{
-					display: 'flex',
-					gap: '10px',
-					flexGrow: '2',
-				}}
-				initialValues={{ todoItemText: `${task.title}` }}
-				onFinish={handlerChangeTodo}
-			>
-				<Form.Item
-					name='todoItemText'
-					rules={[
-						{ required: true, message: 'Поле обязательно для заполнения' },
-						{
-							min: 2,
-							max: 64,
-							message: '',
-						},
-						{
-							validator: (_, value) => {
-								if (!value || value.trim().length < 2 || value.length > 64) {
-									return Promise.reject(
-										new Error(
-											'Задача должна быть от 2 (без учета пробелов) до 64 символов'
-										)
-									)
-								}
-								return Promise.resolve()
-							},
-						},
-					]}
-					style={{ flexGrow: '1', margin: 0 }}
+		<>
+			{contextHolder}
+			<div className={style.toDoList__item}>
+				<Checkbox
+					name={`isDone-${task.id}-${task.isDone}`}
+					onChange={handleDoneTask}
+					checked={task.isDone}
+				/>
+				<Form
+					form={form}
+					name={`todoItemForm-${task.id}`}
+					layout='vertical'
+					autoComplete='off'
+					style={{
+						display: 'flex',
+						gap: '10px',
+						flexGrow: '2',
+					}}
+					initialValues={{ todoItemText: `${task.title}` }}
+					onFinish={handleChangeTodo}
 				>
-					{!isEditing && (
+					<Form.Item
+						name='todoItemText'
+						rules={[
+							{ required: true, message: 'Поле обязательно для заполнения' },
+							{ min: 2, message: 'Задача должна быть от 2 символов' },
+							{ max: 64, message: 'Задача не должна превышать 64 символа' },
+						]}
+						style={{ flexGrow: '1', margin: 0 }}
+					>
 						<Input
 							style={{
-								pointerEvents: 'none',
-								border: 'none',
-								background: 'none',
+								border: !isEditing ? 'none' : '1px solid var(--color-white)',
+								background: !isEditing ? 'none' : 'var(--color-grey-1)',
 								color: task.isDone
 									? 'var(--color-grey-someLight)'
 									: 'var(--color-white)',
 								textDecoration: task.isDone ? 'line-through' : 'none',
 							}}
+							disabled={!isEditing}
 						/>
-					)}
-					{isEditing && (
-						<Input
-							style={{
-								border: '1px solid var(--color-white)',
-								backgroundColor: 'var(--color-grey-1)',
-								color: 'var(--color-white)',
-							}}
-						/>
-					)}
-				</Form.Item>
-				<Form.Item
-					style={{
-						display: 'flex',
-						justifyContent: 'center',
-						alignItems: 'center',
-						margin: 0,
-					}}
-				>
-					<Space>
-						{!isEditing && (
-							<Button onClick={handlerEnterEditMode}>
-								<img src='/editing.svg' alt='редактировать задачу' />
-							</Button>
-						)}
-						{isEditing && (
-							<>
-								<SubmitButton form={form}>
-									<img src='/accept.svg' alt='подтвердить редактирование' />
-								</SubmitButton>
-								<Button onClick={handlerCancelEdit}>
-									<img src='/cancel.svg' alt='отменить редактирование' />
+					</Form.Item>
+					<Form.Item
+						style={{
+							display: 'flex',
+							justifyContent: 'center',
+							alignItems: 'center',
+							margin: 0,
+						}}
+					>
+						<Space>
+							{!isEditing && (
+								<Button onClick={handleEnterEditMode}>
+									<img src='/editing.svg' alt='редактировать задачу' />
 								</Button>
-							</>
-						)}
-						<Button
-							onClick={handlerDeleteTask}
-							style={{
-								backgroundColor: 'var(--color-red-someDark)',
-								border: 'none',
-							}}
-						>
-							<img src='/delete.svg' alt='удалить задачу' />
-						</Button>
-					</Space>
-				</Form.Item>
-			</Form>
-		</div>
+							)}
+							{isEditing && (
+								<>
+									<Button type='primary' htmlType='submit'>
+										<img src='/accept.svg' alt='подтвердить редактирование' />
+									</Button>
+									<Button onClick={handleCancelEdit}>
+										<img src='/cancel.svg' alt='отменить редактирование' />
+									</Button>
+								</>
+							)}
+							<Button
+								onClick={handleDeleteTask}
+								style={{
+									backgroundColor: 'var(--color-red-someDark)',
+									border: 'none',
+								}}
+							>
+								<img src='/delete.svg' alt='удалить задачу' />
+							</Button>
+						</Space>
+					</Form.Item>
+				</Form>
+			</div>
+		</>
 	)
-})
+}

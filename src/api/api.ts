@@ -33,12 +33,12 @@ export const fetchTodo = async (
 		})
 		.catch(err => {
 			throw new Error(
-				`Something error in fetchData task, try again.\nError: ` + err
+				`Что-то сломалось при получении задач, повторите попытку. ` + err
 			)
 		})
 }
 
-export const createTodo = async (createData: CreateTodo): Promise<void> => {
+export const createTodo = async (createData: CreateTodo) => {
 	return apiClient
 		.post('todos', createData)
 		.then(response => {
@@ -46,15 +46,12 @@ export const createTodo = async (createData: CreateTodo): Promise<void> => {
 		})
 		.catch(err => {
 			throw new Error(
-				`Something error in submit task, try again.\nError: ` + err
+				`Что-то сломалось при создании задачи, повторите попытку. ` + err
 			)
 		})
 }
 
-export const updateTodo = async (
-	taskId: number,
-	updateData: TodoRequest
-): Promise<void> => {
+export const updateTodo = async (taskId: number, updateData: TodoRequest) => {
 	return apiClient
 		.put(`todos/${taskId}`, updateData)
 		.then(response => {
@@ -62,7 +59,7 @@ export const updateTodo = async (
 		})
 		.catch(err => {
 			throw new Error(
-				`Something error in change task, try again.\nError: ` + err
+				`Что-то сломалось при изменении задачи, повторите попытку. ` + err
 			)
 		})
 }
@@ -75,7 +72,7 @@ export const deleteTodo = async (taskId: number): Promise<Response> => {
 		})
 		.catch(err => {
 			throw new Error(
-				`Something error in delete task, try again.\nError: ` + err
+				`Что-то сломалось при удалении задачи, повторите попытку.  ` + err
 			)
 		})
 }

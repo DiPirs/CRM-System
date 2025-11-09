@@ -2,19 +2,17 @@ import type { Todo } from '../../types/task.types'
 import TodoItem from '../TodoItem/TodoItem'
 import { List } from 'antd'
 
-interface ITodoList {
+interface TodoListProps {
 	tasks: Todo[]
 	isLoading: boolean
 	onFetchData: () => void
-	getPaused: (status: boolean) => void
 }
 
-export default function TaskList({
+export default function TodoList({
 	tasks,
 	isLoading,
 	onFetchData,
-	getPaused,
-}: ITodoList) {
+}: TodoListProps) {
 	return (
 		<>
 			{isLoading && <span>Loading</span>}
@@ -25,6 +23,7 @@ export default function TaskList({
 					style={{ border: 'none' }}
 					renderItem={item => (
 						<List.Item
+							key={item.id}
 							style={{
 								display: 'flex',
 								border: '2px solid var(--color-grey-1)',
@@ -32,12 +31,7 @@ export default function TaskList({
 								marginBottom: '10px',
 							}}
 						>
-							<TodoItem
-								key={item.id}
-								task={item}
-								onFetchData={onFetchData}
-								getPaused={getPaused}
-							/>
+							<TodoItem task={item} onFetchData={onFetchData} />
 						</List.Item>
 					)}
 				/>

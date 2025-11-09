@@ -10,17 +10,15 @@ import type { MenuProps } from 'antd'
 
 type MenuItem = Required<MenuProps>['items'][number]
 
-interface ITodoNavigation {
+interface TodoNavigationProps {
 	todoFilter: TodoInfo
-	setFilter: FilterTodo
 	getFilter: (fil: FilterTodo) => void
 }
 
 export default function TodoNavigation({
 	todoFilter,
-	setFilter,
 	getFilter,
-}: ITodoNavigation) {
+}: TodoNavigationProps) {
 	const items: MenuItem[] = [
 		{
 			key: 'all',
@@ -48,7 +46,7 @@ export default function TodoNavigation({
 			<Menu
 				onClick={switchTodoFilter}
 				style={{ display: `flex`, fontSize: '18px', background: 'none' }}
-				defaultSelectedKeys={[`${setFilter}`]}
+				defaultSelectedKeys={[`all`]}
 				mode='inline'
 				theme='dark'
 				items={items}
