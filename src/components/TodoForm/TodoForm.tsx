@@ -7,10 +7,14 @@ interface TodoFormProps {
 	onFetchData: () => void
 }
 
+interface TodoFormValues {
+	todoText: string
+}
+
 type NotificationType = 'success' | 'info' | 'warning' | 'error'
 
 export default function TodoForm({ onFetchData }: TodoFormProps) {
-	const [form] = Form.useForm()
+	const [form] = Form.useForm<TodoFormValues>()
 	const [api, contextHolder] = notification.useNotification()
 
 	const openNotificationWithIcon = (
@@ -24,7 +28,7 @@ export default function TodoForm({ onFetchData }: TodoFormProps) {
 		})
 	}
 
-	function handleSubmitTask(values: { todoText: string }) {
+	function handleSubmitTask(values: TodoFormValues) {
 		const formValue: string = values.todoText
 		const isValidate = validateTodoText(formValue.trim())
 		if (isValidate) {

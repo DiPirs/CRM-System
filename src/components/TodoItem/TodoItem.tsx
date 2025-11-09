@@ -11,11 +11,15 @@ interface TodoItemProps {
 	onFetchData: () => void
 }
 
+interface TodoItemFormValues {
+	todoItemText: string
+}
+
 type NotificationType = 'success' | 'info' | 'warning' | 'error'
 
 export default function TodoItem({ task, onFetchData }: TodoItemProps) {
 	const [isEditing, setIsEditing] = useState<boolean>(false)
-	const [form] = Form.useForm()
+	const [form] = Form.useForm<TodoItemFormValues>()
 	const [api, contextHolder] = notification.useNotification()
 
 	const openNotificationWithIcon = (
@@ -58,7 +62,7 @@ export default function TodoItem({ task, onFetchData }: TodoItemProps) {
 			)
 	}
 
-	function handleChangeTodo(values: { todoItemText: string }) {
+	function handleChangeTodo(values: TodoItemFormValues) {
 		const formValue: string = values.todoItemText
 		const isValidate = validateTodoText(formValue.trim())
 		if (isValidate) {
