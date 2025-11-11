@@ -1,9 +1,10 @@
 import { Button, Form, Input, notification, Space } from 'antd'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import style from './RegistrationPage.module.scss'
 import { useForm } from 'antd/es/form/Form'
 import type { UserRegistration } from '../../types/account.types'
 import { checkingPasswordMatch } from '../../utils/validate'
+import { accountSingUp } from '../../api/api'
 
 interface FieldType extends UserRegistration {
 	userSecPassword: string
@@ -14,6 +15,7 @@ type NotificationType = 'success' | 'info' | 'warning' | 'error'
 export default function RegistrationPage() {
 	const [formAccount] = useForm<FieldType>()
 	const [api, contextHolder] = notification.useNotification()
+	const navigate = useNavigate()
 
 	const openNotificationWithIcon = (
 		type: NotificationType,
@@ -40,13 +42,25 @@ export default function RegistrationPage() {
 			])
 			return
 		}
-
-		openNotificationWithIcon(
-			'success',
-			'Успешная регистрация',
-			'Поздравляю, вы теперь в системе!'
-		)
-		formAccount.resetFields()
+		accountSingUp({
+			login: values.login,
+			username: values.username,
+			password: values.password,
+			email: values.email,
+			phoneNumber: values?.phoneNumber,
+		})
+			.then(() => {
+				openNotificationWithIcon(
+					'success',
+					'Успешная регистрация',
+					'Поздравляю, вы теперь в системе!'
+				)
+				formAccount.resetFields()
+				navigate('/login')
+			})
+			.catch(err => {
+				openNotificationWithIcon('error', 'Ошибка регистрации', err)
+			})
 	}
 
 	return (
@@ -131,7 +145,6 @@ export default function RegistrationPage() {
 				<span style={{ fontSize: '18px' }}>Телефон</span>
 				<Form.Item
 					name='phoneNumber'
-					initialValue={'+7'}
 					rules={[
 						{
 							validator: (_, value) => {

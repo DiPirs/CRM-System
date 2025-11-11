@@ -1,14 +1,19 @@
 import { Button, Checkbox, Form, Input, notification } from 'antd'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import style from './LoginPage.module.scss'
 import { useForm } from 'antd/es/form/Form'
 import type { AuthData } from '../../types/account.types'
+import { accountSignIn, fetchProfile } from '../../api/api'
+import { useDispatch } from 'react-redux'
+import { setProfile, setTokens } from '../../store/slices/userSlice'
 
 type NotificationType = 'success' | 'info' | 'warning' | 'error'
 
 export default function LoginPage() {
 	const [formLogin] = useForm<AuthData>()
 	const [api, contextHolder] = notification.useNotification()
+	const navigate = useNavigate()
+	const dispatch = useDispatch()
 
 	const openNotificationWithIcon = (
 		type: NotificationType,
@@ -20,10 +25,33 @@ export default function LoginPage() {
 			description: `${description}`,
 		})
 	}
-	function handleSubmitForm(values: FieldType) {
-		openNotificationWithIcon('success', 'Успешный вход', 'Здравствуйте!')
-		formLogin.resetFields()
+
+	function handleSubmitForm(values: AuthData) {
+		accountSignIn({ login: values.login, password: values.password })
+			.then(tokensResponse => {
+				const tokens = {
+					accessToken: tokensResponse.accessToken,
+					refreshToken: tokensResponse.refreshToken,
+				}
+				dispatch(setTokens(tokens))
+
+				return fetchProfile(tokens.accessToken)
+			})
+			.then(profile => {
+				dispatch(setProfile(profile))
+
+				openNotificationWithIcon('success', 'Успешный вход', 'Здравствуйте!')
+				navigate('/')
+			})
+			.catch(error => {
+				openNotificationWithIcon(
+					'error',
+					'Ошибка входа',
+					error.message || 'Что-то пошло не так. Попробуйте снова.'
+				)
+			})
 	}
+
 	return (
 		<div className={style.layout_content}>
 			{contextHolder}
@@ -72,7 +100,7 @@ export default function LoginPage() {
 
 				<Form.Item>
 					<Button type='primary' htmlType='submit'>
-						Регистрация
+						Войти
 					</Button>
 				</Form.Item>
 				<p>

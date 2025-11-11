@@ -1,37 +1,35 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
+import type { Profile, Token } from '../../types/account.types'
 
-const initialState = {
-	name: null,
-	nickName: null,
-	password: null,
-	phoneNumber: null,
-	email: null,
-	token: null,
+export interface UserState {
+	profile: Profile | null
+	tokens: Token | null
+}
+
+const initialState: UserState = {
+	profile: null,
+	tokens: null,
 }
 
 const userSlice = createSlice({
 	name: 'user',
 	initialState,
 	reducers: {
-		setUser(state, action) {
-			state.name = action.payload.name
-			state.nickName = action.payload.nickName
-			state.password = action.payload.password
-			state.phoneNumber = action.payload.phoneNumber
-			state.email = action.payload.email
-			state.token = action.payload.token
+		setTokens(state, action: PayloadAction<Token>) {
+			state.tokens = action.payload
 		},
+
+		setProfile(state, action: PayloadAction<Profile>) {
+			state.profile = action.payload
+		},
+
 		removeUser(state) {
-			state.name = null
-			state.nickName = null
-			state.password = null
-			state.phoneNumber = null
-			state.email = null
-			state.token = null
+			state.profile = null
+			state.tokens = null
 		},
 	},
 })
 
-export const { setUser, removeUser } = userSlice.actions
+export const { setTokens, setProfile, removeUser } = userSlice.actions
 
 export default userSlice.reducer
