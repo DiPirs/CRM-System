@@ -5,3 +5,7 @@ export default function validateTodoText(value: string): boolean {
 		return true
 	}
 }
+
+export function checkingPasswordMatch(passA: string, passB: string) {
+	return passA === passB
+}
