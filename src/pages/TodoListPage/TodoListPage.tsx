@@ -38,19 +38,18 @@ export default function TodoListPage() {
 	}, [filterTask])
 
 	const fetchData = useCallback(
-		(fil?: FilterTodo): void => {
+		async (fil?: FilterTodo): Promise<void> => {
 			setLoading(true)
-			fetchTodo(fil ? fil : filterTask)
-				.then(data => {
-					setTasks(data.data)
-					setTaskInfo(data.info ?? DEFAULT_INFO)
-				})
-				.catch(err => {
-					openNotificationWithIcon('error', 'Ошибка загрузки данных', err)
-				})
-				.finally(() => {
-					setLoading(false)
-				})
+			try {
+				const data = await fetchTodo(fil ? fil : filterTask)
+				setTasks(data.data)
+				setTaskInfo(data.info ?? DEFAULT_INFO)
+			} catch (err) {
+				const message = err instanceof Error ? err.message : String(err)
+				openNotificationWithIcon('error', 'Ошибка загрузки данных', message)
+			} finally {
+				setLoading(false)
+			}
 		},
 		[filterTask]
 	)

@@ -1,7 +1,6 @@
 import { createTodo } from '../../api/api'
 import { Button, Form, Input, Space, notification } from 'antd'
 import { ClearOutlined, EditOutlined } from '@ant-design/icons'
-import validateTodoText from '../../utils/validate'
 
 interface TodoFormProps {
 	onFetchData: () => void
@@ -28,30 +27,22 @@ export default function TodoForm({ onFetchData }: TodoFormProps) {
 		})
 	}
 
-	function handleSubmitTask(values: TodoFormValues) {
-		const formValue: string = values.todoText
-		const isValidate = validateTodoText(formValue.trim())
-		if (isValidate) {
-			createTodo({ title: formValue.trim() })
-				.then(() =>
-					openNotificationWithIcon(
-						'success',
-						'Успех',
-						'Задача переведена в новый статус'
-					)
-				)
-				.then(() => onFetchData())
-				.then(() => form.setFieldValue('todoText', ''))
-				.catch(err =>
-					openNotificationWithIcon('error', 'Ошибка создания задачи', err)
-				)
-		} else {
-			form.setFields([
-				{
-					name: 'todoText',
-					errors: ['Задача должна быть от 2 символов (не считая пробелы)'],
-				},
-			])
+	async function handleSubmitNewTodo(values: TodoFormValues) {
+		try {
+			const formValue: string = values.todoText
+			await createTodo({ title: formValue.trim() })
+
+			openNotificationWithIcon(
+				'success',
+				'Успех',
+				'Задача переведена в новый статус'
+			)
+
+			onFetchData()
+			form.resetFields()
+		} catch (err) {
+			const message = err instanceof Error ? err.message : String(err)
+			openNotificationWithIcon('error', 'Ошибка создания задачи', message)
 		}
 	}
 
@@ -68,17 +59,13 @@ export default function TodoForm({ onFetchData }: TodoFormProps) {
 					flexDirection: 'column',
 					flexGrow: '2',
 				}}
-				onFinish={handleSubmitTask}
+				onFinish={handleSubmitNewTodo}
 			>
 				<span style={{ fontSize: '18px' }}>Что вы хотели сделать</span>
 				<Form.Item
 					name='todoText'
 					rules={[
 						{ required: true, message: 'Поле обязательно для заполнения' },
-						{
-							whitespace: true,
-							message: 'Задача не должна состоять только из пробелов',
-						},
 						{ min: 2, message: 'Задача должна быть от 2 символов' },
 						{ max: 64, message: 'Задача не должна превышать 64 символа' },
 					]}

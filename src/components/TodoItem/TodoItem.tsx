@@ -4,7 +4,6 @@ import type { Todo } from '../../types/task.types'
 import { deleteTodo, updateTodo } from '../../api/api'
 import { Checkbox } from 'antd'
 import { Button, Form, Input, Space, notification } from 'antd'
-import validateTodoText from '../../utils/validate'
 
 interface TodoItemProps {
 	task: Todo
@@ -42,43 +41,39 @@ export default function TodoItem({ task, onFetchData }: TodoItemProps) {
 		form.resetFields()
 	}
 
-	function handleDoneTask() {
-		updateTodo(task.id, { isDone: !task.isDone })
-			.then(() => onFetchData())
-			.catch(err =>
-				openNotificationWithIcon(
-					'error',
-					'Ошибка перевода задачи в новый статус',
-					err
-				)
+	async function handleDoneTask() {
+		try {
+			await updateTodo(task.id, { isDone: !task.isDone })
+			onFetchData()
+		} catch (err) {
+			const message = err instanceof Error ? err.message : String(err)
+			openNotificationWithIcon(
+				'error',
+				'Ошибка перевода задачи в новый статус',
+				message
 			)
+		}
 	}
 
-	function handleDeleteTask() {
-		deleteTodo(task.id)
-			.then(() => onFetchData())
-			.catch(err =>
-				openNotificationWithIcon('error', 'Ошибка удаления задачи', err)
-			)
+	async function handleDeleteTask() {
+		try {
+			await deleteTodo(task.id)
+			onFetchData()
+		} catch (err) {
+			const message = err instanceof Error ? err.message : String(err)
+			openNotificationWithIcon('error', 'Ошибка удаления задачи', message)
+		}
 	}
 
-	function handleChangeTodo(values: TodoItemFormValues) {
+	async function handleChangeTodo(values: TodoItemFormValues) {
 		const formValue: string = values.todoItemText
-		const isValidate = validateTodoText(formValue.trim())
-		if (isValidate) {
-			updateTodo(task.id, { title: formValue.trim() })
-				.then(() => onFetchData())
-				.then(() => setIsEditing(false))
-				.catch(err =>
-					openNotificationWithIcon('error', 'Ошибка изменении задачи', err)
-				)
-		} else {
-			form.setFields([
-				{
-					name: 'todoItemText',
-					errors: ['Задача должна быть от 2 символов (не считая пробелы)'],
-				},
-			])
+		try {
+			await updateTodo(task.id, { title: formValue.trim() })
+			onFetchData()
+			setIsEditing(false)
+		} catch (err) {
+			const message = err instanceof Error ? err.message : String(err)
+			openNotificationWithIcon('error', 'Ошибка изменении задачи', message)
 		}
 	}
 
