@@ -14,15 +14,16 @@ export default function PageMenu() {
 	const navigate = useNavigate()
 	const location = useLocation()
 
-	const onClick: MenuProps['onClick'] = e => {
+	const handleSwitchPage: MenuProps['onClick'] = e => {
 		const path = e.key
 		navigate(path)
 	}
+
 	return (
 		<div style={{ width: 200 }}>
 			<nav>
 				<Menu
-					onClick={onClick}
+					onClick={handleSwitchPage}
 					style={{ minHeight: '100vh' }}
 					selectedKeys={[location.pathname]}
 					mode='inline'
