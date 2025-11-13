@@ -28,7 +28,7 @@ export default function RegistrationPage() {
 		})
 	}
 
-	function handleSubmitForm(values: FieldType) {
+	async function handleSubmitForm(values: FieldType) {
 		if (!checkingPasswordMatch(values.password, values.userSecPassword)) {
 			formAccount.setFields([
 				{
@@ -42,25 +42,28 @@ export default function RegistrationPage() {
 			])
 			return
 		}
-		accountSingUp({
-			login: values.login,
-			username: values.username,
-			password: values.password,
-			email: values.email,
-			phoneNumber: values?.phoneNumber,
-		})
-			.then(() => {
-				openNotificationWithIcon(
-					'success',
-					'Успешная регистрация',
-					'Поздравляю, вы теперь в системе!'
-				)
-				formAccount.resetFields()
-				navigate('/login')
+
+		try {
+			await accountSingUp({
+				login: values.login,
+				username: values.username,
+				password: values.password,
+				email: values.email,
+				phoneNumber: values?.phoneNumber,
 			})
-			.catch(err => {
-				openNotificationWithIcon('error', 'Ошибка регистрации', err)
-			})
+
+			openNotificationWithIcon(
+				'success',
+				'Успешная регистрация',
+				'Поздравляю, вы теперь в системе!'
+			)
+
+			formAccount.resetFields()
+			navigate('/login')
+		} catch (err) {
+			const message = err instanceof Error ? err.message : String(err)
+			openNotificationWithIcon('error', 'Ошибка регистрации', message)
+		}
 	}
 
 	return (

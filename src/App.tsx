@@ -1,6 +1,7 @@
 import './App.scss'
 import { AuthLayout } from './components/AuthLayout/AuthLayout'
 import { MainLayout } from './components/MainLayout/MainLayout'
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute'
 import AccountPage from './pages/AccountPage/AccountPage'
 import LoginPage from './pages/LoginPage/LoginPage'
 import RegistrationPage from './pages/RegistrationPage/RegistrationPage'
@@ -29,17 +30,21 @@ function App() {
 			<Route
 				path='/'
 				element={
-					<MainLayout>
-						<TodoListPage />
-					</MainLayout>
+					<ProtectedRoute>
+						<MainLayout>
+							<TodoListPage />
+						</MainLayout>
+					</ProtectedRoute>
 				}
 			/>
 			<Route
 				path='/profile'
 				element={
-					<MainLayout>
-						<AccountPage />
-					</MainLayout>
+					<ProtectedRoute>
+						<MainLayout>
+							<AccountPage />
+						</MainLayout>
+					</ProtectedRoute>
 				}
 			/>
 		</Routes>

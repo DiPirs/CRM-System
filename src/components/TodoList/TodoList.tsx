@@ -1,4 +1,5 @@
 import type { Todo } from '../../types/task.types'
+import Loading from '../Loading/Loading'
 import TodoItem from '../TodoItem/TodoItem'
 import { List } from 'antd'
 
@@ -15,7 +16,7 @@ export default function TodoList({
 }: TodoListProps) {
 	return (
 		<>
-			{isLoading && <span>Loading</span>}
+			{isLoading && <Loading />}
 			{!isLoading && (
 				<List
 					bordered

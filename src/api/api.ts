@@ -8,7 +8,7 @@ import type {
 	TodoRequest,
 	CreateTodo,
 } from '../types/task.types'
-import type { AuthData, UserRegistration } from '../types/account.types'
+import type { AuthData, Token, UserRegistration } from '../types/account.types'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
@@ -75,14 +75,13 @@ export const accountSingUp = async (registrationData: UserRegistration) => {
 		}
 	} catch (err: any) {
 		if (err.response) {
-			const status = err.response.status
-			if (status === 400) {
+			if (err.response.status === 400) {
 				throw new Error(
 					'Ошибка ввода данных. Проверьте правильность заполнения полей.'
 				)
-			} else if (status === 409) {
+			} else if (err.response.status === 409) {
 				throw new Error('Пользователь с такими данными уже существует.')
-			} else if (status === 500) {
+			} else if (err.response.status === 500) {
 				throw new Error('Внутренняя ошибка сервера. Попробуйте позже.')
 			}
 		} else {
@@ -99,18 +98,16 @@ export const accountSignIn = async (authData: AuthData) => {
 		}
 	} catch (err: any) {
 		if (err.response) {
-			const status = err.response.status
-
-			if (status === 400) {
+			if (err.response.status === 400) {
 				throw new Error(
 					'Ошибка ввода данных. Проверьте правильность заполнения полей.'
 				)
-			} else if (status === 401) {
+			} else if (err.response.status === 401) {
 				throw new Error('Неверные учетные данные.')
-			} else if (status === 500) {
+			} else if (err.response.status === 500) {
 				throw new Error('Внутренняя ошибка сервера. Попробуйте позже.')
 			} else {
-				throw new Error(`Неизвестная ошибка (${status}).`)
+				throw new Error(`Неизвестная ошибка (${err.response.status}).`)
 			}
 		} else {
 			throw new Error('Что-то пошло не так в авторизации: ' + err.message)
@@ -127,17 +124,16 @@ export const fetchProfile = async (accessToken: string) => {
 			return response.data
 		}
 		throw new Error('Unexpected status')
-	} catch (error: any) {
-		if (error.response) {
-			const status = error.response.status
-			if (status === 401) {
+	} catch (err: any) {
+		if (err.response) {
+			if (err.response.status === 401) {
 				throw new Error('Неавторизованный доступ.')
-			} else if (status === 500) {
+			} else if (err.response.status === 500) {
 				throw new Error('Внутренняя ошибка сервера.')
 			} else {
-				throw new Error(`Неизвестная ошибка (${status}).`)
+				throw new Error(`Неизвестная ошибка (${err.response.status}).`)
 			}
-		} else if (error.request) {
+		} else if (err.request) {
 			throw new Error('Сервер не отвечает.')
 		} else {
 			throw new Error('Что-то пошло не так.')
@@ -155,8 +151,7 @@ export const accountSignOut = async (accessToken: string) => {
 		}
 	} catch (err: any) {
 		if (err.response) {
-			const status = err.response.status
-			if (status === 500) {
+			if (err.response.status === 500) {
 				throw new Error('Внутренняя ошибка сервера. Попробуйте позже.')
 			} else {
 				throw new Error(`Неизвестная ошибка (${status}).`)
@@ -164,5 +159,20 @@ export const accountSignOut = async (accessToken: string) => {
 		} else {
 			throw new Error('Что-то пошло не так при выходе: ' + err.message)
 		}
+	}
+}
+
+export const refreshToken = async (refreshToken: string): Promise<Token> => {
+	try {
+		const response = await apiClient.post<Token>('/auth/refresh', {
+			refreshToken,
+		})
+		console.log(response.data)
+		return response.data
+	} catch (err: any) {
+		if (err.response?.status === 401) {
+			throw new Error('Нужно авторизироваться заново')
+		}
+		throw new Error('Что-то пошло не так при проверке токена: ' + err.message)
 	}
 }

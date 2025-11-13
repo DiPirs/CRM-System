@@ -26,30 +26,30 @@ export default function LoginPage() {
 		})
 	}
 
-	function handleSubmitForm(values: AuthData) {
-		accountSignIn({ login: values.login, password: values.password })
-			.then(tokensResponse => {
-				const tokens = {
-					accessToken: tokensResponse.accessToken,
-					refreshToken: tokensResponse.refreshToken,
-				}
-				dispatch(setTokens(tokens))
+	async function handleSubmitForm(values: AuthData) {
+		try {
+			const tokensResponse = await accountSignIn({
+				login: values.login,
+				password: values.password,
+			})
 
-				return fetchProfile(tokens.accessToken)
-			})
-			.then(profile => {
-				dispatch(setProfile(profile))
+			const tokens = {
+				accessToken: tokensResponse.accessToken,
+				refreshToken: tokensResponse.refreshToken,
+			}
 
-				openNotificationWithIcon('success', 'Успешный вход', 'Здравствуйте!')
-				navigate('/')
-			})
-			.catch(error => {
-				openNotificationWithIcon(
-					'error',
-					'Ошибка входа',
-					error.message || 'Что-то пошло не так. Попробуйте снова.'
-				)
-			})
+			localStorage.setItem('tokens', JSON.stringify(tokens.refreshToken))
+			dispatch(setTokens(tokens))
+
+			const profile = await fetchProfile(tokens.accessToken)
+			dispatch(setProfile(profile))
+
+			openNotificationWithIcon('success', 'Успешный вход', 'Здравствуйте!')
+			navigate('/')
+		} catch (error) {
+			const message = error instanceof Error ? error.message : String(error)
+			openNotificationWithIcon('error', 'Ошибка входа', message)
+		}
 	}
 
 	return (
