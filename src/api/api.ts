@@ -80,7 +80,9 @@ export const accountSingUp = async (registrationData: UserRegistration) => {
 					'Ошибка ввода данных. Проверьте правильность заполнения полей.'
 				)
 			} else if (err.response.status === 409) {
-				throw new Error('Пользователь с такими данными уже существует.')
+				throw new Error(
+					'Пользователь с таким логином и(или) почтой уже создан.'
+				)
 			} else if (err.response.status === 500) {
 				throw new Error('Внутренняя ошибка сервера. Попробуйте позже.')
 			}
@@ -103,7 +105,7 @@ export const accountSignIn = async (authData: AuthData) => {
 					'Ошибка ввода данных. Проверьте правильность заполнения полей.'
 				)
 			} else if (err.response.status === 401) {
-				throw new Error('Неверные учетные данные.')
+				throw new Error('Неверный логин или пароль.')
 			} else if (err.response.status === 500) {
 				throw new Error('Внутренняя ошибка сервера. Попробуйте позже.')
 			} else {
@@ -154,7 +156,7 @@ export const accountSignOut = async (accessToken: string) => {
 			if (err.response.status === 500) {
 				throw new Error('Внутренняя ошибка сервера. Попробуйте позже.')
 			} else {
-				throw new Error(`Неизвестная ошибка (${status}).`)
+				throw new Error(`Неизвестная ошибка (${err.response.status}).`)
 			}
 		} else {
 			throw new Error('Что-то пошло не так при выходе: ' + err.message)
@@ -167,7 +169,6 @@ export const refreshToken = async (refreshToken: string): Promise<Token> => {
 		const response = await apiClient.post<Token>('/auth/refresh', {
 			refreshToken,
 		})
-		console.log(response.data)
 		return response.data
 	} catch (err: any) {
 		if (err.response?.status === 401) {

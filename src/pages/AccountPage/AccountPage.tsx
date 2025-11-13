@@ -13,10 +13,6 @@ export default function AccountPage() {
 	const tokens = useSelector((state: { user: UserState }) => state.user.tokens)
 
 	const handleSignOutAccount = async () => {
-		if (!profile || !tokens) {
-			return <p>Пользователь не авторизован.</p>
-		}
-
 		if (tokens?.accessToken) {
 			try {
 				await accountSignOut(tokens.accessToken)
@@ -24,6 +20,8 @@ export default function AccountPage() {
 				navigate('/login')
 			} catch (err) {
 				console.log(err)
+				dispatch(removeUser())
+				navigate('/login')
 			}
 		}
 	}
@@ -35,8 +33,6 @@ export default function AccountPage() {
 				<p>Имя: {profile?.username}</p>
 				<p>Email: {profile?.email}</p>
 				<p>Телефон: {profile?.phoneNumber}</p>
-				<p>Токен access: {tokens?.accessToken}</p>
-				<p>Токен refresh: {tokens?.refreshToken}</p>
 			</div>
 
 			<Button type='primary' onClick={handleSignOutAccount}>

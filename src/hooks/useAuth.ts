@@ -17,8 +17,8 @@ export function useAuth() {
 
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
-	const [isLoading, setIsLoading] = useState(true)
-	const isChecked = useRef(false)
+	const [isLoading, setIsLoading] = useState<boolean>(true)
+	const isChecked = useRef<boolean>(false)
 
 	useEffect(() => {
 		isChecked.current = false
