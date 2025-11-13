@@ -2,19 +2,16 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { fetchProfile, refreshToken } from '../api/api'
-import {
-	removeUser,
-	setProfile,
-	setTokens,
-	type UserState,
-} from '../store/slices/userSlice'
-import type { RootState } from '../store/store'
+import { removeUser, setProfile } from '../store/user/Slices/userSlice'
+import { selectProfile } from '../modules/user/selectors'
+import { tokenManager } from '../store/utils/tokenManager'
 
 export function useAuth() {
-	const { profile, tokens } = useSelector<RootState, UserState>(
-		state => state.user
-	)
-
+	const profile = useSelector(selectProfile)
+	const isAuthenticated =
+		!!profile &&
+		!!tokenManager.getRefreshToken() &&
+		!!tokenManager.getAccessToken()
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
 	const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -25,26 +22,31 @@ export function useAuth() {
 
 		const checkAuth = async () => {
 			if (isChecked.current) return
-			if (!tokens?.refreshToken) {
-				const tokensStr = localStorage.getItem('tokens')
+			if (!tokenManager.getRefreshToken()) {
+				const tokensStr = localStorage.getItem('refreshToken')
 				if (tokensStr) {
 					try {
 						const localTokens = JSON.parse(tokensStr)
 						const newTokens = await refreshToken(localTokens)
+						tokenManager.clearTokens()
+						tokenManager.setTokens(newTokens)
+
 						localStorage.setItem(
-							'tokens',
-							JSON.stringify(newTokens.refreshToken)
+							'refreshToken',
+							JSON.stringify(tokenManager.getRefreshToken())
 						)
-						dispatch(setTokens(newTokens))
 
 						if (!profile) {
-							const fetchedProfile = await fetchProfile(newTokens.accessToken)
+							const fetchedProfile = await fetchProfile(
+								tokenManager.getAccessToken()!
+							)
 							dispatch(setProfile(fetchedProfile))
 						}
 					} catch (err) {
 						console.error(err)
-						localStorage.removeItem('tokens')
+						localStorage.removeItem('refreshToken')
 						dispatch(removeUser())
+						tokenManager.clearTokens()
 						navigate('/login')
 					}
 				} else {
@@ -53,24 +55,33 @@ export function useAuth() {
 			} else {
 				if (!profile) {
 					try {
-						const fetchedProfile = await fetchProfile(tokens.accessToken)
+						const fetchedProfile = await fetchProfile(
+							tokenManager.getAccessToken()!
+						)
 						dispatch(setProfile(fetchedProfile))
 					} catch (err) {
 						console.error(err)
 						try {
-							const newTokens = await refreshToken(tokens.refreshToken)
-							localStorage.setItem(
-								'tokens',
-								JSON.stringify(newTokens.refreshToken)
+							const newTokens = await refreshToken(
+								tokenManager.getRefreshToken()!
 							)
-							dispatch(setTokens(newTokens))
+							tokenManager.clearTokens()
+							tokenManager.setTokens(newTokens)
 
-							const fetchedProfile = await fetchProfile(newTokens.accessToken)
+							localStorage.setItem(
+								'refreshToken',
+								JSON.stringify(tokenManager.getRefreshToken())
+							)
+
+							const fetchedProfile = await fetchProfile(
+								tokenManager.getAccessToken()!
+							)
 							dispatch(setProfile(fetchedProfile))
 						} catch (refreshErr) {
 							console.error(refreshErr)
-							localStorage.removeItem('tokens')
+							localStorage.removeItem('refreshToken')
 							dispatch(removeUser())
+							tokenManager.clearTokens()
 							navigate('/login')
 						}
 					}
@@ -83,14 +94,11 @@ export function useAuth() {
 		return () => {
 			isChecked.current = true
 		}
-	}, [dispatch, navigate, tokens?.refreshToken, profile, tokens?.accessToken])
-
-	const isAuthenticated = !!profile && !!tokens
+	}, [dispatch, navigate, profile])
 
 	return {
 		isAuthenticated,
 		profile,
-		tokens,
 		isLoading,
 	}
 }

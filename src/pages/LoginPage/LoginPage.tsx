@@ -5,9 +5,10 @@ import { useForm } from 'antd/es/form/Form'
 import type { AuthData } from '../../types/account.types'
 import { accountSignIn, fetchProfile } from '../../api/api'
 import { useDispatch } from 'react-redux'
-import { setProfile, setTokens } from '../../store/slices/userSlice'
+import { setProfile } from '../../store/user/Slices/userSlice'
 import Loading from '../../components/Loading/Loading'
 import { useState } from 'react'
+import { tokenManager } from '../../store/utils/tokenManager'
 
 type NotificationType = 'success' | 'info' | 'warning' | 'error'
 
@@ -37,15 +38,17 @@ export default function LoginPage() {
 				password: values.password,
 			})
 
-			const tokens = {
+			tokenManager.setTokens({
 				accessToken: tokensResponse.accessToken,
 				refreshToken: tokensResponse.refreshToken,
-			}
+			})
 
-			localStorage.setItem('tokens', JSON.stringify(tokens.refreshToken))
-			dispatch(setTokens(tokens))
+			localStorage.setItem(
+				'refreshToken',
+				JSON.stringify(tokenManager.getRefreshToken())
+			)
 
-			const profile = await fetchProfile(tokens.accessToken)
+			const profile = await fetchProfile(tokensResponse.accessToken)
 			dispatch(setProfile(profile))
 			navigate('/')
 		} catch (error) {

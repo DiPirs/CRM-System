@@ -68,12 +68,8 @@ export default function RegistrationPage() {
 		}
 	}
 
-	const handleOk = () => {
+	const handleSwitchLocation = () => {
 		navigate('/login')
-		setIsModalOpen(false)
-	}
-
-	const handleCancel = () => {
 		setIsModalOpen(false)
 	}
 
@@ -194,11 +190,8 @@ export default function RegistrationPage() {
 				closable={{ 'aria-label': 'Custom Close Button' }}
 				open={isModalOpen}
 				footer={[
-					<Button key='toLogin' type='primary' onClick={handleOk}>
+					<Button key='toLogin' type='primary' onClick={handleSwitchLocation}>
 						Авторизоваться
-					</Button>,
-					<Button key='back' onClick={handleCancel}>
-						Остаться тут
 					</Button>,
 				]}
 			>

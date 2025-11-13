@@ -1,22 +1,24 @@
 import { Button } from 'antd'
 import { useDispatch, useSelector } from 'react-redux'
-import { removeUser, type UserState } from '../../store/slices/userSlice'
+import { removeUser } from '../../store/user/Slices/userSlice'
 import { accountSignOut } from '../../api/api'
 import { useNavigate } from 'react-router-dom'
+import { selectUserStore } from '../../modules/user/selectors'
+import { tokenManager } from '../../store/utils/tokenManager'
 
 export default function AccountPage() {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
-	const profile = useSelector(
-		(state: { user: UserState }) => state.user.profile
-	)
-	const tokens = useSelector((state: { user: UserState }) => state.user.tokens)
+
+	const { profile } = useSelector(selectUserStore)
+	const token = tokenManager.getAccessToken()
 
 	const handleSignOutAccount = async () => {
-		if (tokens?.accessToken) {
+		if (token) {
 			try {
-				await accountSignOut(tokens.accessToken)
+				await accountSignOut(token)
 				dispatch(removeUser())
+				tokenManager.clearTokens()
 				navigate('/login')
 			} catch (err) {
 				console.log(err)
