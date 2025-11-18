@@ -66,10 +66,6 @@ export default function TodoForm({ onFetchData }: TodoFormProps) {
 					name='todoText'
 					rules={[
 						{ required: true, message: 'Поле обязательно для заполнения' },
-						{
-							whitespace: true,
-							message: 'Задача не должна состоять только из пробелов',
-						},
 						{ min: 2, message: 'Задача должна быть от 2 символов' },
 						{ max: 64, message: 'Задача не должна превышать 64 символа' },
 					]}
