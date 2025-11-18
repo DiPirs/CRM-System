@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 import type {
 	Todo,
 	TodoInfo,
@@ -9,66 +11,57 @@ import type {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
+const apiClient = axios.create({
+	baseURL: API_BASE_URL,
+	headers: {
+		'Content-Type': 'application/json',
+	},
+})
+
 export const fetchTodo = async (
-	status: FilterTodo = 'all'
+	status: FilterTodo
 ): Promise<MetaResponse<Todo, TodoInfo>> => {
-	return fetch(`${API_BASE_URL}/todos?filter=${status}`)
-		.then(response => {
-			return response.json()
+	try {
+		const response = await apiClient.get('todos', {
+			params: { filter: status },
 		})
-		.then((data: MetaResponse<Todo, TodoInfo>) => {
-			return data
-		})
-		.catch(err => {
-			throw new Error(
-				`Something error in fetchData task, try again.\nError: ` + err
-			)
-		})
+		return response.data
+	} catch (err) {
+		throw new Error(
+			`Что-то сломалось при получении задач, повторите попытку. ` + err
+		)
+	}
 }
 
-export const createTodo = async (createData: CreateTodo): Promise<void> => {
-	return fetch(`${API_BASE_URL}/todos`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(createData),
-	})
-		.then(response => {
-			return response.json()
-		})
-		.catch(err => {
-			throw new Error(
-				`Something error in submit task, try again.\nError: ` + err
-			)
-		})
+export const createTodo = async (createData: CreateTodo) => {
+	try {
+		const response = await apiClient.post('todos', createData)
+		return response.data
+	} catch (err) {
+		throw new Error(
+			`Что-то сломалось при создании задачи, повторите попытку. ` + err
+		)
+	}
 }
 
-export const updateTodo = async (
-	taskId: number,
-	updateData: TodoRequest
-): Promise<void> => {
-	return fetch(`${API_BASE_URL}/todos/${taskId}`, {
-		method: 'PUT',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(updateData),
-	})
-		.then(response => {
-			return response.json()
-		})
-		.catch(err => {
-			throw new Error(
-				`Something error in change task, try again.\nError: ` + err
-			)
-		})
+export const updateTodo = async (taskId: number, updateData: TodoRequest) => {
+	try {
+		const response = await apiClient.put(`todos/${taskId}`, updateData)
+		return response.data
+	} catch (err) {
+		throw new Error(
+			`Что-то сломалось при изменении задачи, повторите попытку. ` + err
+		)
+	}
 }
 
 export const deleteTodo = async (taskId: number): Promise<Response> => {
-	return fetch(`${API_BASE_URL}/todos/${taskId}`, {
-		method: 'DELETE',
-	}).catch(err => {
-		throw new Error(`Something error in delete task, try again.\nError: ` + err)
-	})
+	try {
+		const response = await apiClient.delete(`todos/${taskId}`)
+		return response.data
+	} catch (err) {
+		throw new Error(
+			`Что-то сломалось при удалении задачи, повторите попытку. ` + err
+		)
+	}
 }
