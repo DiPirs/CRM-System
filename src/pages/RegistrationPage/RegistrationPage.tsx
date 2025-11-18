@@ -3,10 +3,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import style from './RegistrationPage.module.scss'
 import { useForm } from 'antd/es/form/Form'
 import type { UserRegistration } from '../../types/account.types'
-import { checkingPasswordMatch } from '../../utils/validate'
 import { accountSingUp } from '../../api/api'
 import { useState } from 'react'
-import Loading from '../../components/Loading/Loading'
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner'
 
 interface FieldType extends UserRegistration {
 	userSecPassword: string
@@ -21,11 +20,11 @@ export default function RegistrationPage() {
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
 	const navigate = useNavigate()
 
-	const openNotificationWithIcon = (
+	function openNotificationWithIcon(
 		type: NotificationType,
 		title: string,
-		description?: string
-	) => {
+		description: string
+	) {
 		api[type]({
 			message: `${title}`,
 			description: `${description}`,
@@ -33,7 +32,7 @@ export default function RegistrationPage() {
 	}
 
 	async function handleSubmitForm(values: FieldType) {
-		if (!checkingPasswordMatch(values.password, values.userSecPassword)) {
+		if (values.password === values.userSecPassword) {
 			formAccount.setFields([
 				{
 					name: 'password',
@@ -68,7 +67,7 @@ export default function RegistrationPage() {
 		}
 	}
 
-	const handleSwitchLocation = () => {
+	function handleSwitchLocation() {
 		navigate('/login')
 		setIsModalOpen(false)
 	}
@@ -77,7 +76,7 @@ export default function RegistrationPage() {
 		<div className={style.layout_content}>
 			{contextHolder}
 			<h1>Регистрация</h1>
-			{isLoading && <Loading />}
+			{isLoading && <LoadingSpinner />}
 			{!isLoading && (
 				<Form
 					form={formAccount}

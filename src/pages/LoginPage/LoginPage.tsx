@@ -2,11 +2,11 @@ import { Button, Form, Input, notification } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
 import style from './LoginPage.module.scss'
 import { useForm } from 'antd/es/form/Form'
-import type { AuthData } from '../../types/account.types'
+import type { AuthData, Token } from '../../types/account.types'
 import { accountSignIn, fetchProfile } from '../../api/api'
 import { useDispatch } from 'react-redux'
 import { setProfile } from '../../store/user/Slices/userSlice'
-import Loading from '../../components/Loading/Loading'
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner'
 import { useState } from 'react'
 import { tokenManager } from '../../store/utils/tokenManager'
 
@@ -19,11 +19,11 @@ export default function LoginPage() {
 	const navigate = useNavigate()
 	const dispatch = useDispatch()
 
-	const openNotificationWithIcon = (
+	function openNotificationWithIcon(
 		type: NotificationType,
 		title: string,
-		description?: string
-	) => {
+		description: string
+	) {
 		api[type]({
 			message: `${title}`,
 			description: `${description}`,
@@ -33,7 +33,7 @@ export default function LoginPage() {
 	async function handleSubmitForm(values: AuthData) {
 		setLoading(true)
 		try {
-			const tokensResponse = await accountSignIn({
+			const tokensResponse: Token = await accountSignIn({
 				login: values.login,
 				password: values.password,
 			})
@@ -63,7 +63,7 @@ export default function LoginPage() {
 		<div className={style.layout_content}>
 			{contextHolder}
 			<h1>Авторизация</h1>
-			{isLoading && <Loading />}
+			{isLoading && <LoadingSpinner />}
 			{!isLoading && (
 				<Form
 					form={formLogin}

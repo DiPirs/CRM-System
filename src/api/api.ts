@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { type AxiosResponse } from 'axios'
 
 import type {
 	Todo,
@@ -19,9 +19,9 @@ const apiClient = axios.create({
 	},
 })
 
-export const fetchTodo = async (
+export async function fetchTodo(
 	status: FilterTodo
-): Promise<MetaResponse<Todo, TodoInfo>> => {
+): Promise<MetaResponse<Todo, TodoInfo>> {
 	try {
 		const response = await apiClient.get('todos', {
 			params: { filter: status },
@@ -34,7 +34,7 @@ export const fetchTodo = async (
 	}
 }
 
-export const createTodo = async (createData: CreateTodo) => {
+export async function createTodo(createData: CreateTodo) {
 	try {
 		const response = await apiClient.post('todos', createData)
 		return response.data
@@ -45,7 +45,7 @@ export const createTodo = async (createData: CreateTodo) => {
 	}
 }
 
-export const updateTodo = async (taskId: number, updateData: TodoRequest) => {
+export async function updateTodo(taskId: number, updateData: TodoRequest) {
 	try {
 		const response = await apiClient.put(`todos/${taskId}`, updateData)
 		return response.data
@@ -56,10 +56,10 @@ export const updateTodo = async (taskId: number, updateData: TodoRequest) => {
 	}
 }
 
-export const deleteTodo = async (taskId: number): Promise<Response> => {
+export async function deleteTodo(taskId: number): Promise<AxiosResponse> {
 	try {
 		const response = await apiClient.delete(`todos/${taskId}`)
-		return response.data
+		return response
 	} catch (err) {
 		throw new Error(
 			`Что-то сломалось при удалении задачи, повторите попытку. ` + err
@@ -67,13 +67,11 @@ export const deleteTodo = async (taskId: number): Promise<Response> => {
 	}
 }
 
-export const accountSingUp = async (registrationData: UserRegistration) => {
+export async function accountSingUp(registrationData: UserRegistration) {
 	try {
 		const response = await apiClient.post(`/auth/signup`, registrationData)
-		if (response.status === 201) {
-			return response.data
-		}
-	} catch (err: any) {
+		return response.data
+	} catch (err) {
 		if (err.response) {
 			if (err.response.status === 400) {
 				throw new Error(
@@ -87,18 +85,16 @@ export const accountSingUp = async (registrationData: UserRegistration) => {
 				throw new Error('Внутренняя ошибка сервера. Попробуйте позже.')
 			}
 		} else {
-			throw new Error('Что-то пошло не так в регистрации: ' + err.message)
+			throw new Error('Что-то пошло не так в регистрации: ' + err)
 		}
 	}
 }
 
-export const accountSignIn = async (authData: AuthData) => {
+export async function accountSignIn(authData: AuthData) {
 	try {
 		const response = await apiClient.post('/auth/signin', authData)
-		if (response.status === 200) {
-			return response.data
-		}
-	} catch (err: any) {
+		return response.data
+	} catch (err) {
 		if (err.response) {
 			if (err.response.status === 400) {
 				throw new Error(
@@ -112,21 +108,18 @@ export const accountSignIn = async (authData: AuthData) => {
 				throw new Error(`Неизвестная ошибка (${err.response.status}).`)
 			}
 		} else {
-			throw new Error('Что-то пошло не так в авторизации: ' + err.message)
+			throw new Error('Что-то пошло не так в авторизации: ' + err)
 		}
 	}
 }
 
-export const fetchProfile = async (accessToken: string) => {
+export async function fetchProfile(accessToken: string) {
 	try {
 		const response = await apiClient.get('/user/profile', {
 			headers: { Authorization: `Bearer ${accessToken}` },
 		})
-		if (response.status === 200) {
-			return response.data
-		}
-		throw new Error('Unexpected status')
-	} catch (err: any) {
+		return response.data
+	} catch (err) {
 		if (err.response) {
 			if (err.response.status === 401) {
 				throw new Error('Неавторизованный доступ.')
@@ -143,15 +136,13 @@ export const fetchProfile = async (accessToken: string) => {
 	}
 }
 
-export const accountSignOut = async (accessToken: string) => {
+export async function accountSignOut(accessToken: string) {
 	try {
 		const response = await apiClient.post('/user/logout', undefined, {
 			headers: { Authorization: `Bearer ${accessToken}` },
 		})
-		if (response.status === 200) {
-			return response.data
-		}
-	} catch (err: any) {
+		return response.data
+	} catch (err) {
 		if (err.response) {
 			if (err.response.status === 500) {
 				throw new Error('Внутренняя ошибка сервера. Попробуйте позже.')
@@ -159,21 +150,21 @@ export const accountSignOut = async (accessToken: string) => {
 				throw new Error(`Неизвестная ошибка (${err.response.status}).`)
 			}
 		} else {
-			throw new Error('Что-то пошло не так при выходе: ' + err.message)
+			throw new Error('Что-то пошло не так при выходе: ' + err)
 		}
 	}
 }
 
-export const refreshToken = async (refreshToken: string): Promise<Token> => {
+export async function refreshToken(refreshToken: string): Promise<Token> {
 	try {
 		const response = await apiClient.post<Token>('/auth/refresh', {
 			refreshToken,
 		})
 		return response.data
-	} catch (err: any) {
+	} catch (err) {
 		if (err.response?.status === 401) {
 			throw new Error('Нужно авторизироваться заново')
 		}
-		throw new Error('Что-то пошло не так при проверке токена: ' + err.message)
+		throw new Error('Что-то пошло не так при проверке токена: ' + err)
 	}
 }

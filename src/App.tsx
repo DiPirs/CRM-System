@@ -2,7 +2,7 @@ import './App.scss'
 import { AuthLayout } from './components/AuthLayout/AuthLayout'
 import { MainLayout } from './components/MainLayout/MainLayout'
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute'
-import AccountPage from './pages/AccountPage/AccountPage'
+import ProfilePage from './pages/ProfilePage/ProfilePage'
 import LoginPage from './pages/LoginPage/LoginPage'
 import RegistrationPage from './pages/RegistrationPage/RegistrationPage'
 import TodoListPage from './pages/TodoListPage/TodoListPage'
@@ -42,7 +42,7 @@ function App() {
 				element={
 					<ProtectedRoute>
 						<MainLayout>
-							<AccountPage />
+							<ProfilePage />
 						</MainLayout>
 					</ProtectedRoute>
 				}

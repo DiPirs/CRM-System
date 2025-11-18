@@ -6,22 +6,22 @@ import { useNavigate } from 'react-router-dom'
 import { selectUserStore } from '../../modules/user/selectors'
 import { tokenManager } from '../../store/utils/tokenManager'
 
-export default function AccountPage() {
+export default function ProfilePage() {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
 
 	const { profile } = useSelector(selectUserStore)
 	const token = tokenManager.getAccessToken()
 
-	const handleSignOutAccount = async () => {
+	async function handleSignOutAccount() {
 		if (token) {
 			try {
 				await accountSignOut(token)
 				dispatch(removeUser())
 				tokenManager.clearTokens()
+				localStorage.removeItem('refreshToken')
 				navigate('/login')
 			} catch (err) {
-				console.log(err)
 				dispatch(removeUser())
 				navigate('/login')
 			}

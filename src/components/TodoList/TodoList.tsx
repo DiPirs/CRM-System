@@ -1,5 +1,5 @@
 import type { Todo } from '../../types/task.types'
-import Loading from '../Loading/Loading'
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner'
 import TodoItem from '../TodoItem/TodoItem'
 import { List } from 'antd'
 
@@ -16,7 +16,7 @@ export default function TodoList({
 }: TodoListProps) {
 	return (
 		<>
-			{isLoading && <Loading />}
+			{isLoading && <LoadingSpinner />}
 			{!isLoading && (
 				<List
 					bordered
