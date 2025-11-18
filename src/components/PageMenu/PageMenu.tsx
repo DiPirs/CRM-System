@@ -18,6 +18,7 @@ export default function PageMenu() {
 		const path = e.key
 		navigate(path)
 	}
+
 	return (
 		<div style={{ width: 200 }}>
 			<nav>

@@ -22,11 +22,11 @@ export default function TodoListPage() {
 
 	const [api, contextHolder] = notification.useNotification()
 
-	const openNotificationWithIcon = (
+	function openNotificationWithIcon(
 		type: NotificationType,
 		title: string,
 		description: string
-	) => {
+	) {
 		api[type]({
 			message: `${title}`,
 			description: `${description}`,
@@ -38,7 +38,7 @@ export default function TodoListPage() {
 	}, [filterTask])
 
 	const fetchData = useCallback(
-		async (fil?: FilterTodo): Promise<void> => {
+		async function fetchData(fil?: FilterTodo): Promise<void> {
 			setLoading(true)
 			try {
 				const data = await fetchTodo(fil ? fil : filterTask)

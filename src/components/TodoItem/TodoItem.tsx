@@ -21,11 +21,11 @@ export default function TodoItem({ task, onFetchData }: TodoItemProps) {
 	const [form] = Form.useForm<TodoItemFormValues>()
 	const [api, contextHolder] = notification.useNotification()
 
-	const openNotificationWithIcon = (
+	function openNotificationWithIcon(
 		type: NotificationType,
 		title: string,
 		description: string
-	) => {
+	) {
 		api[type]({
 			message: `${title}`,
 			description: `${description}`,

@@ -16,11 +16,11 @@ export default function TodoForm({ onFetchData }: TodoFormProps) {
 	const [form] = Form.useForm<TodoFormValues>()
 	const [api, contextHolder] = notification.useNotification()
 
-	const openNotificationWithIcon = (
+	function openNotificationWithIcon(
 		type: NotificationType,
 		title: string,
 		description: string
-	) => {
+	) {
 		api[type]({
 			message: `${title}`,
 			description: `${description}`,
