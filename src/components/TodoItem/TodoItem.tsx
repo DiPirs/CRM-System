@@ -1,6 +1,7 @@
 import style from './TodoItem.module.scss'
 import { useState } from 'react'
 import type { Todo } from '../../types/task.types'
+import type { NotificationType } from '../../types/component'
 import { deleteTodo, updateTodo } from '../../api/api'
 import { Checkbox } from 'antd'
 import { Button, Form, Input, Space, notification } from 'antd'
@@ -14,8 +15,6 @@ interface TodoItemFormValues {
 	todoItemText: string
 }
 
-type NotificationType = 'success' | 'info' | 'warning' | 'error'
-
 export default function TodoItem({ task, onFetchData }: TodoItemProps) {
 	const [isEditing, setIsEditing] = useState<boolean>(false)
 	const [form] = Form.useForm<TodoItemFormValues>()
@@ -24,7 +23,7 @@ export default function TodoItem({ task, onFetchData }: TodoItemProps) {
 	const openNotificationWithIcon = (
 		type: NotificationType,
 		title: string,
-		description: string
+		description: string,
 	) => {
 		api[type]({
 			message: `${title}`,
@@ -50,7 +49,7 @@ export default function TodoItem({ task, onFetchData }: TodoItemProps) {
 			openNotificationWithIcon(
 				'error',
 				'Ошибка перевода задачи в новый статус',
-				message
+				message,
 			)
 		}
 	}

@@ -1,0 +1,43 @@
+.layout {
+	margin: 5px 10px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.heading {
+	margin: 0;
+	margin-bottom: 10px;
+	padding: 10px;
+	border-radius: 10px;
+	background-color: var(--color-accent);
+	color: var(--color-white);
+}
+
+.userInfo {
+	padding: 5px;
+	margin-bottom: 10px;
+	border: 1px solid var(--color-grey);
+	border-radius: 10px;
+
+	.infoText {
+		margin: 0;
+	}
+}
+
+.logout {
+	display: flex;
+	gap: 10px;
+	justify-content: center;
+	align-items: center;
+	max-width: 200px;
+	height: 40px;
+	border: none;
+	border-radius: 5px;
+	background-color: var(--color-accent);
+	color: var(--color-white);
+}
+
+.logout:hover {
+	background-color: var(--color-accent-light);
+}

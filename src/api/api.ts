@@ -19,7 +19,7 @@ const apiClient = axios.create({
 })
 
 export const fetchTodo = async (
-	status: FilterTodo
+	status: FilterTodo,
 ): Promise<MetaResponse<Todo, TodoInfo>> => {
 	try {
 		const response = await apiClient.get('todos', {
@@ -28,7 +28,7 @@ export const fetchTodo = async (
 		return response.data
 	} catch (err) {
 		throw new Error(
-			`Что-то сломалось при получении задач, повторите попытку. ` + err
+			`Что-то сломалось при получении задач, повторите попытку. ` + err,
 		)
 	}
 }
@@ -39,7 +39,7 @@ export const createTodo = async (createData: CreateTodo) => {
 		return response.data
 	} catch (err) {
 		throw new Error(
-			`Что-то сломалось при создании задачи, повторите попытку. ` + err
+			`Что-то сломалось при создании задачи, повторите попытку. ` + err,
 		)
 	}
 }
@@ -50,7 +50,7 @@ export const updateTodo = async (taskId: number, updateData: TodoRequest) => {
 		return response.data
 	} catch (err) {
 		throw new Error(
-			`Что-то сломалось при изменении задачи, повторите попытку. ` + err
+			`Что-то сломалось при изменении задачи, повторите попытку. ` + err,
 		)
 	}
 }
@@ -61,7 +61,7 @@ export const deleteTodo = async (taskId: number): Promise<Response> => {
 		return response.data
 	} catch (err) {
 		throw new Error(
-			`Что-то сломалось при удалении задачи, повторите попытку. ` + err
+			`Что-то сломалось при удалении задачи, повторите попытку. ` + err,
 		)
 	}
 }

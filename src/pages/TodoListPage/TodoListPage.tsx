@@ -1,6 +1,7 @@
 import style from './TodoListPage.module.scss'
-import { useCallback, useEffect, useRef, useState } from 'react'
 import type { FilterTodo, Todo, TodoInfo } from '../../types/task.types'
+import type { NotificationType } from '../../types/component'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { fetchTodo } from '../../api/api'
 import {
 	DEFAULT_INFO,
@@ -10,8 +11,6 @@ import TodoForm from '../../components/TodoForm/TodoForm'
 import TodoList from '../../components/TodoList/TodoList'
 import TodoNavigation from '../../components/TodoNavigation/TodoNavigation'
 import { notification } from 'antd'
-
-type NotificationType = 'success' | 'info' | 'warning' | 'error'
 
 export default function TodoListPage() {
 	const [tasks, setTasks] = useState<Todo[]>([])
@@ -25,7 +24,7 @@ export default function TodoListPage() {
 	const openNotificationWithIcon = (
 		type: NotificationType,
 		title: string,
-		description: string
+		description: string,
 	) => {
 		api[type]({
 			message: `${title}`,
@@ -51,7 +50,7 @@ export default function TodoListPage() {
 				setLoading(false)
 			}
 		},
-		[filterTask]
+		[filterTask],
 	)
 
 	useEffect(() => {
