@@ -1,0 +1,15 @@
+.page_illustration {
+	max-height: 100vh;
+}
+
+.layoutContainer {
+	display: flex;
+	min-height: 100vh;
+}
+
+.layoutContent {
+	display: flex;
+	flex-grow: 1;
+	justify-content: center;
+	align-items: center;
+}

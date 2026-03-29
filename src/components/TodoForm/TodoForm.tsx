@@ -1,6 +1,7 @@
 import { createTodo } from '../../api/api'
 import { Button, Form, Input, Space, notification } from 'antd'
 import { ClearOutlined, EditOutlined } from '@ant-design/icons'
+import type { NotificationType } from '../../types/component'
 
 interface TodoFormProps {
 	onFetchData: () => void
@@ -10,8 +11,6 @@ interface TodoFormValues {
 	todoText: string
 }
 
-type NotificationType = 'success' | 'info' | 'warning' | 'error'
-
 export default function TodoForm({ onFetchData }: TodoFormProps) {
 	const [form] = Form.useForm<TodoFormValues>()
 	const [api, contextHolder] = notification.useNotification()
@@ -19,7 +18,7 @@ export default function TodoForm({ onFetchData }: TodoFormProps) {
 	const openNotificationWithIcon = (
 		type: NotificationType,
 		title: string,
-		description: string
+		description: string,
 	) => {
 		api[type]({
 			message: `${title}`,
@@ -35,7 +34,7 @@ export default function TodoForm({ onFetchData }: TodoFormProps) {
 			openNotificationWithIcon(
 				'success',
 				'Успех',
-				'Задача переведена в новый статус'
+				'Задача переведена в новый статус',
 			)
 
 			onFetchData()
